@@ -1,5 +1,7 @@
 package org.opensourcecommunity.pomodoroapp.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -21,6 +23,7 @@ public class Pause extends BaseEntity {
 
 	@ManyToOne
 	@JoinColumn(name = "pomodoro_session_id")
+	@JsonBackReference
 	private PomodoroSession pomodoroSession;
 
 }

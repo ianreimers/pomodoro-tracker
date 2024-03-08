@@ -1,13 +1,18 @@
 package org.opensourcecommunity.pomodoroapp;
 
+import org.opensourcecommunity.pomodoroapp.models.BreakTypeEnum;
+import org.opensourcecommunity.pomodoroapp.models.PomodoroSession;
 import org.opensourcecommunity.pomodoroapp.models.User;
 import org.opensourcecommunity.pomodoroapp.models.UserSettings;
+import org.opensourcecommunity.pomodoroapp.repositories.PomodoroSessionRepository;
 import org.opensourcecommunity.pomodoroapp.repositories.UserRepository;
 import org.opensourcecommunity.pomodoroapp.repositories.UserSettingsRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+
+import com.github.javafaker.Faker;
 
 @SpringBootApplication
 public class PomodoroAppApplication {
@@ -16,21 +21,46 @@ public class PomodoroAppApplication {
 		SpringApplication.run(PomodoroAppApplication.class, args);
 	}
 
-	@Bean
+	// @Bean
 	public CommandLineRunner commandLineRunner(UserRepository userRepository,
-			UserSettingsRepository userSettingsRepository) {
+			UserSettingsRepository userSettingsRepository,
+			PomodoroSessionRepository pomodoroSessionRepository) {
 
 		return args -> {
-			var user = User.builder()
-					.username("thedale")
-					.email("thedale@gmail.com")
-					.password("dateiscool123")
-					.build();
-			var userSettings = UserSettings.builder()
-					.build();
-
-			userRepository.save(user);
-			userSettingsRepository.save(userSettings);
+			/*
+			 * Faker faker = new Faker();
+			 * 
+			 * for (int i = 0; i < 50; i++) {
+			 * // Create a user
+			 * User user = User.builder()
+			 * .username(faker.name().username())
+			 * .email(faker.internet().emailAddress())
+			 * .password(faker.internet().password(8, 12))
+			 * .build();
+			 * User responseUser = userRepository.save(user);
+			 * 
+			 * // Add the users default settings
+			 * UserSettings userSettings = UserSettings.builder()
+			 * .user(responseUser)
+			 * .build();
+			 * userSettingsRepository.save(userSettings);
+			 * 
+			 * // Create a pomodoro session that a user "completed"
+			 * PomodoroSession pomodoroSession = PomodoroSession.builder()
+			 * .user(responseUser)
+			 * .setStudyTime(userSettings.getStudyTime())
+			 * .setLongBreakTime(userSettings.getLongBreakTime())
+			 * .setShortBreakTime(userSettings.getShortBreakTime())
+			 * .breakDuration(faker.number().numberBetween(0,
+			 * userSettings.getShortBreakTime()))
+			 * .studyDuration(faker.number().numberBetween(0,
+			 * userSettings.getStudyTime()))
+			 * .breakType(BreakTypeEnum.SHORT)
+			 * .build();
+			 * pomodoroSessionRepository.save(pomodoroSession);
+			 * 
+			 * }
+			 */
 
 		};
 	}

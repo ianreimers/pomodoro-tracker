@@ -1,5 +1,7 @@
 package org.opensourcecommunity.pomodoroapp.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
@@ -30,5 +32,6 @@ public class UserSettings extends BaseEntity {
 
 	@OneToOne
 	@JoinColumn(name = "user_id")
+	@JsonBackReference
 	private User user;
 }

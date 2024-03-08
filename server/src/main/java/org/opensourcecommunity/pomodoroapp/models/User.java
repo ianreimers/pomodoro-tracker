@@ -6,6 +6,9 @@ import java.util.List;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
@@ -31,17 +34,13 @@ public class User extends BaseEntity {
 	private String email;
 	@Column(nullable = false)
 	private String password;
-	@Column(updatable = false, nullable = false)
-	@CreationTimestamp
-	private ZonedDateTime createdAt;
-	@Column(nullable = false)
-	@UpdateTimestamp
-	private ZonedDateTime updatedAt;
 
-	@OneToOne(mappedBy = "user")
+	@OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+	@JsonManagedReference
 	private UserSettings userSettings;
 
-	@OneToMany(mappedBy = "user")
+	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+	@JsonManagedReference
 	private List<PomodoroSession> pomodoroSessions;
 
 }

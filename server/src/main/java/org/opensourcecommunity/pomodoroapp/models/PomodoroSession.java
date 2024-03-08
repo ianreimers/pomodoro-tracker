@@ -3,10 +3,14 @@ package org.opensourcecommunity.pomodoroapp.models;
 import java.util.List;
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
@@ -37,8 +41,10 @@ public class PomodoroSession extends BaseEntity {
 
 	@ManyToOne
 	@JoinColumn(name = "user_id")
+	@JsonBackReference
 	private User user;
 
 	@OneToMany(mappedBy = "pomodoroSession")
+	@JsonManagedReference
 	private List<Pause> pauses;
 }

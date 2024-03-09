@@ -1,5 +1,6 @@
 package org.opensourcecommunity.pomodoroapp.models;
 
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -15,6 +16,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -29,14 +31,22 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @SuperBuilder
 public class PomodoroSession extends BaseEntity {
-	@Column(unique = true)
-	private UUID tempId;
+	@NotNull
+	private UUID tempUuid;
 	private Integer studyDuration;
 	private Integer breakDuration;
-	private Integer setStudyTime;
-	private Integer setShortBreakTime;
-	private Integer setLongBreakTime;
+	@Column(nullable = false)
+	private Integer sessionStudyTime;
+	@Column(nullable = false)
+	private Integer sessionShortBreakTime;
+	@Column(nullable = false)
+	private Integer sessionLongBreakTime;
+	@Column(nullable = false)
+	private ZonedDateTime sessionStartTime;
+	@Column(nullable = false)
+	private ZonedDateTime sessionUpdateTime;
 	@Enumerated(EnumType.STRING)
+	@Column(nullable = false)
 	private BreakTypeEnum breakType;
 
 	@ManyToOne

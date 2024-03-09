@@ -6,27 +6,20 @@ import java.util.stream.Collectors;
 
 import org.opensourcecommunity.pomodoroapp.dtos.UserDto;
 import org.opensourcecommunity.pomodoroapp.dtos.UserResponseDto;
-import org.opensourcecommunity.pomodoroapp.dtos.UserSettingsDto;
+import org.opensourcecommunity.pomodoroapp.exceptions.UserNotFoundException;
 import org.opensourcecommunity.pomodoroapp.mappers.UserMapper;
 import org.opensourcecommunity.pomodoroapp.models.User;
-import org.opensourcecommunity.pomodoroapp.models.UserSettings;
 import org.opensourcecommunity.pomodoroapp.repositories.UserRepository;
-import org.opensourcecommunity.pomodoroapp.repositories.UserSettingsRepository;
 import org.springframework.stereotype.Service;
-
-import jakarta.persistence.EntityNotFoundException;
 
 @Service
 public class UserService {
 	private final UserRepository userRepository;
-	private final UserSettingsRepository userSettingsRepository;
 	private final UserMapper userMapper;
 
-	public UserService(UserRepository userRepository, UserMapper userMapper,
-			UserSettingsRepository userSettingsRepository) {
+	public UserService(UserRepository userRepository, UserMapper userMapper) {
 		this.userRepository = userRepository;
 		this.userMapper = userMapper;
-		this.userSettingsRepository = userSettingsRepository;
 	}
 
 	public List<UserResponseDto> getAllUsers() {
@@ -34,37 +27,26 @@ public class UserService {
 		return users.stream().map(user -> userMapper.userToUserResponseDto(user)).collect(Collectors.toList());
 	}
 
-	public UserResponseDto createUser(UserDto userDto) {
+	public User createUser(UserDto userDto) {
+		// Create a new user with the given user information
 		User user = userMapper.userDtoToUser(userDto);
-
 		User savedUser = userRepository.save(user);
-
-		// Create the user settings using db defaults
-		UserSettings userSettings = new UserSettings();
-		userSettings.setUser(user);
-
-		// Attach it to the saved user that gets returned
-		UserSettings savedUserSettings = userSettingsRepository.save(userSettings);
-		savedUser.setUserSettings(savedUserSettings);
-
-		return userMapper.userToUserResponseDto(savedUser);
+		return savedUser;
 	}
 
-	public UserResponseDto getUserById(Long id) {
-		User user = userRepository.findById(id).orElse(null);
+	public UserResponseDto convertUserToUserResponseDto(User user) {
 		return userMapper.userToUserResponseDto(user);
-
 	}
 
-	public UserSettingsDto updateUserSettings(Long userId, UserSettingsDto dto) {
-		UserSettings userSettings = userSettingsRepository.findByUserId(userId);
-		userSettings.setStudyTime(dto.studyTime());
-		userSettings.setLongBreakTime(dto.longBreakTime());
-		userSettings.setShortBreakTime(dto.shortBreakTime());
+	public UserResponseDto getUserResponseDtoById(Long id) {
+		User user = userRepository.findById(id)
+				.orElseThrow(() -> new UserNotFoundException("User does not exist with id " + id));
+		return userMapper.userToUserResponseDto(user);
+	}
 
-		UserSettings updatedUserSettings = userSettingsRepository.save(userSettings);
-
-		return userMapper.userSettingsToUserSettingsDto(updatedUserSettings);
+	public User getUserById(Long id) {
+		return userRepository.findById(id)
+				.orElseThrow(() -> new UserNotFoundException("User does not exist with id " + id));
 	}
 
 	public User getUserByUsername(String username) {
@@ -73,6 +55,10 @@ public class UserService {
 	}
 
 	public void deleteUserById(Long id) {
+		if (!userRepository.existsById(id)) {
+			throw new UserNotFoundException("User does not exists, unable to delete");
+		}
+
 		userRepository.deleteById(id);
 	}
 

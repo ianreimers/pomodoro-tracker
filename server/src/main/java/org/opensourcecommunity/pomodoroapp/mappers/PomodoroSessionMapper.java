@@ -1,5 +1,8 @@
 package org.opensourcecommunity.pomodoroapp.mappers;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.opensourcecommunity.pomodoroapp.dtos.PomodoroSessionDto;
 import org.opensourcecommunity.pomodoroapp.dtos.PomodoroSessionResponseDto;
 import org.opensourcecommunity.pomodoroapp.models.PomodoroSession;
@@ -37,6 +40,14 @@ public class PomodoroSessionMapper {
 				pomodoroSession.getSessionStartTime(),
 				pomodoroSession.getSessionUpdateTime(),
 				pomodoroSession.getBreakType());
+
+	}
+
+	public List<PomodoroSessionResponseDto> pomodoroSessionsToPomodoroResponseDtos(
+			List<PomodoroSession> pomodoros) {
+		return pomodoros.stream()
+				.map(this::pomodoroSessionToPomodoroResponseDto)
+				.collect(Collectors.toList());
 
 	}
 

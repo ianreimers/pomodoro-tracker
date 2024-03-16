@@ -11,6 +11,8 @@ public interface PomodoroSessionRepository extends JpaRepository<PomodoroSession
 
 	public List<PomodoroSession> findAllByUserId(Long userId);
 
+	public List<PomodoroSession> findAllByUser(User user);
+
 	public User findUserByUserId(Long userId);
 
 }

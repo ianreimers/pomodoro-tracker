@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import "../styles/globals.css"
+import "./globals.css"
 import AuthContextProvider from "@/contexts/auth-context";
 import { Toaster } from "@/components/ui/toaster";
 import Navbar from "@/components/main-nav";
+import UserContextProvider from "@/contexts/user-context";
+import PomodoroContextProvider from "@/contexts/pomodoro-context";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -19,13 +21,17 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body className={`${inter.className} bg-background`}>
         <AuthContextProvider>
           <Navbar />
-          {children}
+          <UserContextProvider>
+            <PomodoroContextProvider>
+              {children}
+            </PomodoroContextProvider>
+          </UserContextProvider>
         </AuthContextProvider>
         <Toaster />
       </body>
     </html>
-  );
+  )
 }

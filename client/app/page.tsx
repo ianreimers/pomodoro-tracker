@@ -1,74 +1,49 @@
 "use client"
 
 import { Button } from "@/components/ui/button";
-import { useEffect, useState } from "react";
-import { secondsToTime } from "@/lib/utils";
+import { secondsToTime, title } from "@/lib/utils";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import UserSettingsForm from "@/components/user-settings-form";
+import { usePomodoroContext } from "@/contexts/pomodoro-context";
 
-
-const TIME = 1500;
 
 export default function Home() {
-  const [time, setTime] = useState(TIME);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [intervalTimeRemaing, setIntervalTimeRemaining] = useState(0);
+  const {
+    remainingSeconds,
+    currSession,
+    isPlaying,
+    totalPomodoros,
+    setIsPlaying
+  } = usePomodoroContext();
 
-  useEffect(() => {
-    if (!isPlaying) {
-      return
-    }
 
-    // Capture the moment, in millis, this second began
-    let startTime = Date.now();
-
-    const intervalId = setInterval(() => {
-      setTime(time - 1);
-
-      // Interval completed so ensure that the remaining time from last stoppage is reset
-      setIntervalTimeRemaining((_) => 0);
-
-    }, 1000 - intervalTimeRemaing); // The remaining time is when the user paused in (second - timeRemaining)
-
-    return () => {
-      const stopTime = Date.now();
-      const milliDiff = stopTime - startTime;
-
-      setIntervalTimeRemaining((t) => {
-        if (t == 0 && milliDiff >= 1000) {
-          return 0
-        }
-
-        return milliDiff + t;
-      })
-
-      // Clear the interval upon unmount
-      clearInterval(intervalId);
-    }
-  }, [time, isPlaying])
-
-  function handleClick() {
+  function handleToggleIsPlaying() {
     setIsPlaying(!isPlaying);
   }
 
-
   return (
-    <Tabs defaultValue="session">
-      <TabsList>
-        <TabsTrigger value="session">Session</TabsTrigger>
-        <TabsTrigger value="settings">Settings</TabsTrigger>
+    <div className="max-w-screen-sm mx-auto mt-12">
+      <Tabs defaultValue="session">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="session">Session</TabsTrigger>
+          <TabsTrigger value="settings">Settings</TabsTrigger>
+        </TabsList>
+        <TabsContent value="session">
+          <div className="flex flex-col items-center w-full bg-background">
+            <h2 className="text-4xl w-full text-center my-4 font-bold text-foreground underline">{title(currSession)}</h2>
+            <p className="text-9xl mb-8 text-center w-full text-foreground">{secondsToTime(remainingSeconds)}</p>
+            <h3 className="mb-4">Total Pomodoros: {totalPomodoros}</h3>
+            <Button size="lg" variant="default" onClick={handleToggleIsPlaying}>{isPlaying ? "Stop" : "Start"}</Button>
+          </div>
 
-      </TabsList>
-      <TabsContent value="session">
-        <div className="flex flex-col items-center w-full">
-          <p className="text-9xl mb-8 text-center w-full">{secondsToTime(time)}</p>
-          <Button variant={"outline"} size="lg" onClick={handleClick}>{isPlaying ? "Stop" : "Start"}</Button>
+        </TabsContent>
+        <TabsContent value="settings">
+          <UserSettingsForm />
+        </TabsContent>
 
+      </Tabs>
 
-        </div>
-
-      </TabsContent>
-
-    </Tabs>
+    </div>
 
   )
 }

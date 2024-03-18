@@ -126,7 +126,7 @@ export function useAuthContext() {
 	const context = useContext(AuthContext);
 
 	if (!context) {
-		throw new Error("useGlobalContext must be used within a GlobalContextProvider");
+		throw new Error("useAuthContext must be used within a AuthContextProvider");
 	}
 
 	return context;

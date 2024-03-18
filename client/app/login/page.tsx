@@ -1,34 +1,35 @@
-'use client';
+"use client";
 
-import { FormEvent, ReactEventHandler, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { useAuthContext } from '@/contexts/auth-context';
-import { toast } from '@/components/ui/use-toast';
+import LoginForm from "@/components/login-form";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
+import { cn } from "@/lib/utils";
+
 
 const LoginPage = () => {
-  const [credentials, setCredentials] = useState({ username: '', password: '' });
-  const { login, user } = useAuthContext();
-  const router = useRouter();
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setCredentials({
-      ...credentials,
-      [e.target.name]: e.target.value
-    });
-  };
-
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-    try {
-      await login(credentials);
-      router.push("/")
-    } catch (error) {
-      console.error('Login failed:', error);
-    }
-  };
-
   return (
-    <div>
+    <Card className={cn("w-[380px] m-auto mt-12")}>
+      <CardHeader>
+        <CardTitle>Login</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <LoginForm />
+      </CardContent>
+    </Card>
+  )
+};
+
+export default LoginPage;
+
+
+/*
+ *    <div>
       <h1>Login</h1>
       <form onSubmit={handleSubmit}>
         <div>
@@ -54,7 +55,7 @@ const LoginPage = () => {
         <button type="submit">Login</button>
       </form>
     </div>
-  );
-};
 
-export default LoginPage;
+ *
+ *
+ * */

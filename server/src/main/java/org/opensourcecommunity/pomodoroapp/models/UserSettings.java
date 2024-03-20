@@ -22,13 +22,16 @@ import lombok.experimental.SuperBuilder;
 public class UserSettings extends BaseEntity {
 	@Column(nullable = false, columnDefinition = "INT DEFAULT 1500")
 	@Builder.Default
-	private Integer studyTime = 1500;
+	private Integer taskSeconds = 1500;
 	@Column(nullable = false, columnDefinition = "INT DEFAULT 600")
 	@Builder.Default
-	private Integer shortBreakTime = 600;
+	private Integer shortBreakSeconds = 600;
 	@Column(nullable = false, columnDefinition = "INT DEFAULT 1800")
 	@Builder.Default
-	private Integer longBreakTime = 1800;
+	private Integer longBreakSeconds = 1800;
+	@Column(nullable = false, columnDefinition = "INT DEFAULT 4")
+	@Builder.Default
+	private Integer pomodoroInterval = 4;
 
 	@OneToOne
 	@JoinColumn(name = "user_id")

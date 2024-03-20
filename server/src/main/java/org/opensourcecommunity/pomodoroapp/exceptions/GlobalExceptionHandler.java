@@ -28,6 +28,12 @@ public class GlobalExceptionHandler {
 		return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
 	}
 
+	@ExceptionHandler(InvalidCredentialsException.class)
+	public ResponseEntity<?> handleInvalidCredentialsException(InvalidCredentialsException exp) {
+		ErrorResponse errorResponse = new ErrorResponse(Arrays.asList(exp.getMessage()));
+		return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
+	}
+
 	@ExceptionHandler(UserNotFoundException.class)
 	public ResponseEntity<?> handleUserNotFoundException(UserNotFoundException exp) {
 		ErrorResponse errorResponse = new ErrorResponse(Arrays.asList(exp.getMessage()));

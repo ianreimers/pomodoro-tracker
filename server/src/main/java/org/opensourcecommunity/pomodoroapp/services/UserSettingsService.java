@@ -25,6 +25,11 @@ public class UserSettingsService {
 				.orElseThrow(() -> new UserSettingsNotFoundException("Could not find user settings"));
 	}
 
+	public UserSettingsDto getUserSettingsByUser(User user) {
+		UserSettings userSettings = user.getUserSettings();
+		return userSettingsMapper.userSettingsToUserSettingsDto(userSettings);
+	}
+
 	public UserSettings createUserSettings(User user) {
 		UserSettings userSettings = new UserSettings();
 		userSettings.setUser(user);
@@ -35,12 +40,27 @@ public class UserSettingsService {
 		return savedUserSettings;
 	}
 
-	public UserSettingsDto updateUserSettings(Long userId, UserSettingsDto dto) {
-		UserSettings userSettings = userSettingsRepository.findByUserId(userId);
-		userSettings.setStudyTime(dto.studyTime());
-		userSettings.setLongBreakTime(dto.longBreakTime());
-		userSettings.setShortBreakTime(dto.shortBreakTime());
+	public UserSettingsDto userSettingsToUserSettingsDto(UserSettings userSettings) {
+		return userSettingsMapper.userSettingsToUserSettingsDto(userSettings);
+	}
 
+	public UserSettingsDto updateUserSettings(User user, UserSettingsDto dto) {
+		// UserSettings userSettings = userSettingsRepository.findByUserId(userId);
+		// userSettings.setStudyTime(dto.studyTime());
+		// userSettings.setLongBreakTime(dto.longBreakTime());
+		// userSettings.setShortBreakTime(dto.shortBreakTime());
+		//
+		// UserSettings updatedUserSettings = userSettingsRepository.save(userSettings);
+
+		// Since the Authentication strips alot of information, and we are asting it to
+		// a User in the controller, this might not perform the desired operation
+		// UserSettings userSettings =
+		// userSettingsMapper.userSettingsDtoToUserSettings(dto, user);
+		UserSettings userSettings = userSettingsRepository.findByUser(user);
+		userSettings.setTaskSeconds(dto.taskSeconds());
+		userSettings.setShortBreakSeconds(dto.shortBreakSeconds());
+		userSettings.setLongBreakSeconds(dto.longBreakSeconds());
+		userSettings.setPomodoroInterval(dto.pomodoroInterval());
 		UserSettings updatedUserSettings = userSettingsRepository.save(userSettings);
 
 		return userSettingsMapper.userSettingsToUserSettingsDto(updatedUserSettings);

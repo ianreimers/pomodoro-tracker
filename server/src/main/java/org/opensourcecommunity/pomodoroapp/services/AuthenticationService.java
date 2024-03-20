@@ -4,11 +4,15 @@ import org.opensourcecommunity.pomodoroapp.config.JwtService;
 import org.opensourcecommunity.pomodoroapp.dtos.AuthenticationRequestDto;
 import org.opensourcecommunity.pomodoroapp.dtos.AuthenticationResponseDto;
 import org.opensourcecommunity.pomodoroapp.dtos.RegisterRequestDto;
+import org.opensourcecommunity.pomodoroapp.dtos.UserSettingsDto;
+import org.opensourcecommunity.pomodoroapp.exceptions.InvalidCredentialsException;
 import org.opensourcecommunity.pomodoroapp.models.User;
+import org.opensourcecommunity.pomodoroapp.models.UserSettings;
 import org.opensourcecommunity.pomodoroapp.repositories.UserRepository;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -35,17 +39,31 @@ public class AuthenticationService {
 		userSettingsService.createUserSettings(savedUser);
 
 		String jwtToken = jwtService.generateToken(user);
-		return AuthenticationResponseDto.builder().token(jwtToken).build();
+		return AuthenticationResponseDto
+				.builder()
+				.username(savedUser.getUsername())
+				.token(jwtToken)
+				.build();
 	}
 
 	public AuthenticationResponseDto authenticate(AuthenticationRequestDto request) {
+		try {
+			authenticationManager.authenticate(
+					new UsernamePasswordAuthenticationToken(request.getUsername(),
+							request.getPassword()));
 
-		authenticationManager.authenticate(
-				new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
+		} catch (AuthenticationException e) {
+			throw new InvalidCredentialsException("Invalid credentials");
+		}
 
 		User user = userRepository.findByUsername(request.getUsername()).orElseThrow();
 		String jwtToken = jwtService.generateToken(user);
-		return AuthenticationResponseDto.builder().token(jwtToken).build();
+
+		return AuthenticationResponseDto
+				.builder()
+				.token(jwtToken)
+				.username(user.getUsername())
+				.build();
 	}
 
 	public boolean isUserAuthorized(User user, Authentication auth) {

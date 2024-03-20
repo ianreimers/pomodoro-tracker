@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/api")
 @RequiredArgsConstructor
 public class AuthenticationController {
 
@@ -26,7 +26,7 @@ public class AuthenticationController {
 
 	}
 
-	@PostMapping("/authenticate")
+	@PostMapping("/login")
 	public ResponseEntity<AuthenticationResponseDto> register(@RequestBody AuthenticationRequestDto request) {
 		return ResponseEntity.ok(service.authenticate(request));
 

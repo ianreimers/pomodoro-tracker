@@ -52,13 +52,6 @@ public class UserController {
 		return userService.convertUserToUserResponseDto(savedUser);
 	}
 
-	@PutMapping("/users/{id}/settings")
-	public UserSettingsDto updateUserSettings(@PathVariable(name = "id") Long userId,
-			@Valid @RequestBody UserSettingsDto dto) {
-		return userSettingsService.updateUserSettings(userId, dto);
-
-	}
-
 	@DeleteMapping("/users/{id}")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	public void deleteUser(@PathVariable Long id) {

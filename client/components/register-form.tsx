@@ -1,3 +1,4 @@
+
 import { FormEvent, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthContext } from '@/contexts/auth-context';
@@ -17,31 +18,35 @@ const formSchema = z.object({
 			message: "Username must be less than 256 characters"
 
 		}),
-	password: z.string().min(6).max(255)
+	password: z.string().min(6).max(255),
+	email: z.string().email()
 });
 
-export default function LoginForm() {
+export default function RegisterForm() {
 	const [credentials, setCredentials] = useState({ username: '', password: '' });
-	const { login } = useAuthContext();
+	const { register } = useAuthContext();
 	const router = useRouter();
 
 	const form = useForm<z.infer<typeof formSchema>>({
 		resolver: zodResolver(formSchema),
 		defaultValues: {
 			username: "",
-			password: ""
+			password: "",
+			email: ""
 		}
 	})
 
 	async function onSubmit(values: z.infer<typeof formSchema>) {
 		try {
-			await login(values)
+			await register(values)
+			console.log("Login was successful");
 
 		} catch (error) {
 			// Error could be handles in axios interceptor
-			console.log("Login-Form error:", error);
+			console.log("Error in LoginForm component");
 		}
 	}
+
 
 	return (
 		<Form {...form}>
@@ -70,6 +75,19 @@ export default function LoginForm() {
 							<FormLabel>Password</FormLabel>
 							<FormControl>
 								<Input placeholder="Password" type='password' {...field} />
+							</FormControl>
+							<FormMessage />
+						</FormItem>
+					)}
+				/>
+				<FormField
+					control={form.control}
+					name="email"
+					render={({ field }) => (
+						<FormItem>
+							<FormLabel>Email</FormLabel>
+							<FormControl>
+								<Input placeholder="Email" type='email' {...field} />
 							</FormControl>
 							<FormMessage />
 						</FormItem>

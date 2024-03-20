@@ -1,7 +1,7 @@
 "use client";
 
 import { Dispatch, SetStateAction, createContext, useContext, useEffect, useReducer, useState } from "react";
-import { useUserContext } from "./user-context";
+import { useUserSettingsContext } from "./user-settings-context";
 
 type UserContextProviderProps = {
 	children: React.ReactNode;
@@ -22,7 +22,7 @@ interface PomodoroContextType {
 export const PomodoroContext = createContext<PomodoroContextType | null>(null);
 
 export default function PomodoroContextProvider({ children }: UserContextProviderProps) {
-	const { taskSeconds, shortBreakSeconds, longBreakSeconds, pomodoroInterval } = useUserContext();
+	const { taskSeconds, shortBreakSeconds, longBreakSeconds, pomodoroInterval } = useUserSettingsContext();
 
 	const [remainingSeconds, setRemainingSeconds] = useState(taskSeconds);
 	const [intervalTimeRemaining, setIntervalTimeRemaining] = useState(0);

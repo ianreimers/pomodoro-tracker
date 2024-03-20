@@ -1,14 +1,14 @@
 'use client';
 
 import { useRouter } from "next/navigation";
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useState, useEffect, useReducer, Reducer, ReducerAction } from "react";
+import { useToast } from "@/components/ui/use-toast";
+import axiosInstance from "@/api/axiosInstance";
+import { UserSettings, AuthenticatedUser, User, RegistrationData } from "@/types/types";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 type AuthContextProviderProps = {
 	children: React.ReactNode
-}
-
-interface User {
-	username: string;
 }
 
 interface Credentials {
@@ -16,103 +16,169 @@ interface Credentials {
 	password: string;
 }
 
+
 interface AuthContextType {
 	user: User | null;
+	isLoading: boolean;
 	login: (credentials: Credentials) => Promise<void>;
-	logout: () => Promise<void>;
-	register: (userData: Credentials) => Promise<void>;
+	register: (data: RegistrationData) => Promise<void>;
+	logout: () => void;
+	isAuthenticated: () => boolean;
+}
 
+interface AuthState {
+	user: User | null;
+	token: string;
+	isLoading: boolean;
 
 }
+
+const initialState: AuthState = {
+	user: null,
+	token: "",
+	isLoading: false,
+}
+
+
+type ACTIONTYPE =
+	| { type: "register_success", payload: { user: User; token: string; } }
+	| { type: "login_success", payload: { user: User; token: string } }
+	| { type: "register_fail" }
+	| { type: "logout" };
+
+function reducer(state: AuthState, action: ACTIONTYPE): AuthState {
+	switch (action.type) {
+		case "login_success":
+		case "register_success":
+			return {
+				...state,
+				user: action.payload.user,
+				token: action.payload.token,
+			}
+		case "register_fail":
+			return {
+				...state,
+			}
+		case "logout":
+			return {
+				user: null,
+				token: "",
+				isLoading: false
+			}
+	}
+}
+
 
 export const AuthContext = createContext<AuthContextType | null>(null);
 
 
 export default function AuthContextProvider({ children }: AuthContextProviderProps) {
+	const [state, dispatch] = useReducer(reducer, initialState);
 	const router = useRouter();
-	const [user, setUser] = useState<User | null>(null);
-	const apiUrl = "http://localhost:8080/api"
+	const { toast } = useToast();
+	const queryClient = useQueryClient();
 
 	const login = async (credentials: Credentials) => {
 		try {
-			console.log(apiUrl);
-			const response = await fetch(`${apiUrl}/login`, {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json"
-				},
-				body: JSON.stringify(credentials)
-			})
+			const response = await axiosInstance.post("/login", credentials);
 
-			if (!response.ok) {
-				console.log(response)
-				throw new Error("Login Failed");
+			// Consider validating response data
+			const data: AuthenticatedUser = response.data;
+			const loggedInUser: User = {
+				username: data.username,
 			}
 
-			const data = await response.json();
-			const token = data.token;
-			setUser({ username: credentials.username });
-			localStorage.setItem('token', token);
+			localStorage.setItem("token", data.token);
+			localStorage.setItem("user", JSON.stringify(loggedInUser))
+			dispatch({
+				type: "login_success",
+				payload: {
+					user: loggedInUser,
+					token: data.token
+				}
+			});
 
-			router.push("/dashboard");
+			toast({
+				description: "Login Success!"
+			});
+			router.push("/");
 		} catch (error) {
-			console.error("Login failed:", error);
+			toast({ description: "Server error occured", variant: "destructive" });
+		}
+
+	}
+
+	const register = async (formData: RegistrationData) => {
+		try {
+			const response = await axiosInstance.post("/register", formData);
+			const data: AuthenticatedUser = response.data;
+			const loggedInUser: User = {
+				username: data.username,
+			}
+
+			localStorage.setItem("token", data.token);
+			localStorage.setItem("user", JSON.stringify(loggedInUser))
+			dispatch({
+				type: "register_success",
+				payload: {
+					user: loggedInUser,
+					token: data.token
+				}
+			});
+
+			toast({
+				description: "Registration Success!"
+			});
+			router.push("/");
+		} catch (error) {
+			toast({ description: "Server error occured", variant: "destructive" });
+
 		}
 	}
 
-	// Function to log out user
-	const logout = async (): Promise<void> => {
-		try {
-			// Perform logout logic (e.g., clear authentication state)
-			setUser(null); // Clear user state
-			localStorage.removeItem('token'); // Remove token from storage
-			router.push('/'); // Redirect to home page
-		} catch (error) {
-			console.error('Logout failed:', error);
-		}
-	};
+	function logout() {
+		localStorage.removeItem("token");
+		localStorage.removeItem("user")
+		dispatch({
+			type: "logout"
+		});
+		queryClient.clear();
+		router.push("/login");
+	}
 
-	// Function to register user
-	const register = async (userData: Credentials): Promise<void> => {
-		try {
-			// Perform registration logic (e.g., send registration request to backend)
-			// Upon successful registration, set authenticated user
-			const response = await fetch(`${apiUrl}/register`, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json'
-				},
-				body: JSON.stringify(userData)
-			});
+	function isAuthenticated() {
+		return !!state.user;
+	}
 
-			if (!response.ok) {
-				throw new Error('Registration failed');
-			}
-
-			const data = await response.json();
-			const token = data.token;
-			setUser({ username: userData.username });
-			localStorage.setItem('token', token);
-
-			router.push('/dashboard'); // Redirect to dashboard page
-		} catch (error) {
-			console.error('Registration failed:', error);
-			// Handle registration failure
-		}
-	};
 
 	// Restore user session on page load
 	useEffect(() => {
 		const token = localStorage.getItem('token');
-		if (token) {
+		let user: string | User | null = localStorage.getItem('user');
+
+		// Consider validating local storage
+		if (token && user) {
+			user = JSON.parse(user) as User;
+
+			dispatch({
+				type: "login_success",
+				payload: { user, token }
+			})
+
+			toast({
+				description: "user loaded"
+			})
 		}
+
 	}, []);
 
 	const contextValue: AuthContextType = {
-		user,
+		user: state.user,
+		isLoading: state.isLoading,
 		login,
+		register,
 		logout,
-		register
+		isAuthenticated
 	}
 
 	return (
@@ -124,6 +190,7 @@ export default function AuthContextProvider({ children }: AuthContextProviderPro
 
 export function useAuthContext() {
 	const context = useContext(AuthContext);
+
 
 	if (!context) {
 		throw new Error("useAuthContext must be used within a AuthContextProvider");

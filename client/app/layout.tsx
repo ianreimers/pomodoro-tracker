@@ -4,8 +4,12 @@ import "./globals.css"
 import AuthContextProvider from "@/contexts/auth-context";
 import { Toaster } from "@/components/ui/toaster";
 import Navbar from "@/components/main-nav";
-import UserContextProvider from "@/contexts/user-context";
+import UserSettingsContextProvider from "@/contexts/user-settings-context";
 import PomodoroContextProvider from "@/contexts/pomodoro-context";
+
+
+import App from "@/components/app";
+import { AxiosInterceptor } from "@/api/axiosInstance";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -22,15 +26,19 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.className} bg-background`}>
-        <AuthContextProvider>
-          <Navbar />
-          <UserContextProvider>
-            <PomodoroContextProvider>
-              {children}
-            </PomodoroContextProvider>
-          </UserContextProvider>
-        </AuthContextProvider>
-        <Toaster />
+        <App>
+          <AuthContextProvider>
+            <AxiosInterceptor>
+              <Navbar />
+              <UserSettingsContextProvider>
+                <PomodoroContextProvider>
+                  {children}
+                </PomodoroContextProvider>
+              </UserSettingsContextProvider>
+            </AxiosInterceptor>
+          </AuthContextProvider>
+          <Toaster />
+        </App>
       </body>
     </html>
   )

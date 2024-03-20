@@ -4,20 +4,9 @@ import { z } from 'zod';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { useUserContext } from '@/contexts/user-context';
+import { useUserSettingsContext } from '@/contexts/user-settings-context';
+import { userSettingsFormSchema } from '@/validation_schema/schemas';
 
-const formSchema = z.object({
-	taskTimeHours: z.coerce.number().max(23).min(0),
-	taskTimeMinutes: z.coerce.number(),
-	taskTimeSeconds: z.coerce.number(),
-	shortBreakHours: z.coerce.number(),
-	shortBreakMinutes: z.coerce.number(),
-	shortBreakSeconds: z.coerce.number(),
-	longBreakHours: z.coerce.number(),
-	longBreakMinutes: z.coerce.number(),
-	longBreakSeconds: z.coerce.number(),
-	pomodoroInterval: z.coerce.number()
-});
 
 export default function UserSettingsForm() {
 	const {
@@ -25,15 +14,11 @@ export default function UserSettingsForm() {
 		shortBreakTimeUnits,
 		longBreakTimeUnits,
 		pomodoroInterval,
-		changeTaskTime,
-		changeShortBreakTime,
-		changeLongBreakTime,
-		changePomodoroInterval
-	} = useUserContext();
+		updateSettings
+	} = useUserSettingsContext();
 
-
-	const form = useForm<z.infer<typeof formSchema>>({
-		resolver: zodResolver(formSchema),
+	const form = useForm<z.infer<typeof userSettingsFormSchema>>({
+		resolver: zodResolver(userSettingsFormSchema),
 		defaultValues: {
 			taskTimeHours: taskTimeUnits.hours,
 			taskTimeMinutes: taskTimeUnits.mins,
@@ -48,25 +33,8 @@ export default function UserSettingsForm() {
 		}
 	})
 
-	function onSubmit(values: z.infer<typeof formSchema>) {
-		changeTaskTime({
-			hours: values.taskTimeHours,
-			mins: values.taskTimeMinutes,
-			secs: values.taskTimeSeconds,
-		})
-		changeShortBreakTime({
-			hours: values.shortBreakHours,
-			mins: values.shortBreakMinutes,
-			secs: values.shortBreakSeconds,
-
-		})
-		changeLongBreakTime({
-			hours: values.longBreakHours,
-			mins: values.longBreakMinutes,
-			secs: values.longBreakSeconds,
-
-		})
-		changePomodoroInterval(values.pomodoroInterval);
+	function onSubmit(values: z.infer<typeof userSettingsFormSchema>) {
+		updateSettings(values);
 	}
 
 

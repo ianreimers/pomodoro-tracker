@@ -1,11 +1,13 @@
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
+import { TimeUnits, UserSettings, UserSettingsState } from "@/types/types"
+import { UserSettingsFormData } from "@/validation_schema/schemas"
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-export function timeUnitsToSeconds(hours: number, mins: number, secs: number) {
+export function timeUnitsToSeconds({ hours, mins, secs }: TimeUnits) {
   return secs + (mins * 60) + (hours * 60 * 60)
 
 }
@@ -30,4 +32,82 @@ export function title(words: string) {
   }
 
   return word_arr.join(" ");
+}
+
+export function secondsToTimeUnits(seconds: number) {
+  return {
+    hours: Math.floor(seconds / 60 / 60) % 24,
+    mins: Math.floor(seconds / 60) % 60,
+    secs: seconds % 60,
+  }
+}
+
+export function mapSettingsToState(settings: UserSettings): UserSettingsState {
+  return {
+    taskSeconds: settings.taskSeconds,
+    shortBreakSeconds: settings.shortBreakSeconds,
+    longBreakSeconds: settings.longBreakSeconds,
+    taskTimeUnits: secondsToTimeUnits(settings.taskSeconds),
+    shortBreakTimeUnits: secondsToTimeUnits(settings.shortBreakSeconds),
+    longBreakTimeUnits: secondsToTimeUnits(settings.longBreakSeconds),
+    pomodoroInterval: settings.pomodoroInterval
+  }
+}
+
+export function mapUserSettingsFormDataToRequest(settingsFormData: UserSettingsFormData): UserSettings {
+  const {
+    taskSeconds,
+    shortBreakSeconds,
+    longBreakSeconds,
+    pomodoroInterval } = mapUserSettingsFormDataToState(settingsFormData);
+
+  return {
+    taskSeconds,
+    shortBreakSeconds,
+    longBreakSeconds,
+    pomodoroInterval
+  }
+}
+
+export function mapUserSettingsFormDataToState(settingsFormData: UserSettingsFormData): UserSettingsState {
+  const {
+    taskTimeHours,
+    taskTimeMinutes,
+    taskTimeSeconds,
+    shortBreakHours,
+    shortBreakMinutes,
+    shortBreakSeconds,
+    longBreakHours,
+    longBreakMinutes,
+    longBreakSeconds,
+    pomodoroInterval
+
+  } = settingsFormData;
+
+  const taskTimeUnits = {
+    hours: taskTimeHours,
+    mins: taskTimeMinutes,
+    secs: taskTimeSeconds
+  };
+  const shortBreakTimeUnits = {
+    hours: shortBreakHours,
+    mins: shortBreakMinutes,
+    secs: shortBreakSeconds,
+
+  };
+  const longBreakTimeUnits = {
+    hours: longBreakHours,
+    mins: longBreakMinutes,
+    secs: longBreakSeconds,
+  };
+
+  return {
+    taskSeconds: timeUnitsToSeconds(taskTimeUnits),
+    shortBreakSeconds: timeUnitsToSeconds(shortBreakTimeUnits),
+    longBreakSeconds: timeUnitsToSeconds(longBreakTimeUnits),
+    taskTimeUnits,
+    shortBreakTimeUnits,
+    longBreakTimeUnits,
+    pomodoroInterval
+  }
 }

@@ -6,6 +6,7 @@ import { useToast } from "@/components/ui/use-toast";
 import axiosInstance from "@/api/axiosInstance";
 import { UserSettings, AuthenticatedUser, User, RegistrationData } from "@/types/types";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import axios from "axios";
 
 type AuthContextProviderProps = {
 	children: React.ReactNode
@@ -103,7 +104,11 @@ export default function AuthContextProvider({ children }: AuthContextProviderPro
 			});
 			router.push("/");
 		} catch (error) {
-			toast({ description: "Server error occured", variant: "destructive" });
+			if (axios.isAxiosError(error)) {
+				// Error should already be handled in the axios error response interceptor.
+			} else {
+				toast({ description: "Server error occured", variant: "destructive" });
+			}
 		}
 
 	}

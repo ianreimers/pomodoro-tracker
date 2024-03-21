@@ -84,7 +84,9 @@ export default function UserSettingsContextProvider({ children }: UserContextPro
 			return response.data as UserSettings;
 		},
 		onError: (error) => {
-			console.log(error);
+			toast({
+				description: error.message,
+			})
 		},
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ['userSettings'] })
@@ -109,7 +111,9 @@ export default function UserSettingsContextProvider({ children }: UserContextPro
 		}
 
 		if (error) {
-			console.log(error);
+			toast({
+				description: error.message,
+			})
 		}
 
 	}, [userSettings]);

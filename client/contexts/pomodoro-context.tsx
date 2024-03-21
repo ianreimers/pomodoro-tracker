@@ -67,6 +67,9 @@ export default function PomodoroContextProvider({ children }: UserContextProvide
 			if (remainingSeconds == 0) {
 				switch (currSession) {
 					case "task": {
+						// Increment pomodoro count
+						setTotalPomodoros(totalPomodoros + 1);
+
 						if (totalPomodoros % pomodoroInterval == pomodoroInterval - 1) {
 							setCurrSession("long break");
 							setRemainingSeconds(longBreakSeconds);
@@ -81,7 +84,6 @@ export default function PomodoroContextProvider({ children }: UserContextProvide
 					case "long break": {
 						setCurrSession("task");
 						setRemainingSeconds(taskSeconds);
-						setTotalPomodoros(totalPomodoros + 1);
 					}
 				}
 			}

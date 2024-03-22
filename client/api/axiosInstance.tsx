@@ -42,6 +42,10 @@ function AxiosInterceptor({ children }: { children: React.ReactNode }) {
     } else if (error.request) {
       // A request was made but no response was received
       console.error("No response received:", error.request)
+      toast({
+        description: "No response received from the server",
+        variant: "destructive"
+      })
     } else {
       console.error("Something happened in setting up the request that triggered an error", error.message);
     }

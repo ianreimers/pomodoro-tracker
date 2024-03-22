@@ -35,24 +35,24 @@ public class PomodoroSessionService {
 		return pomodoroSessionMapper.pomodoroSessionsToPomodoroResponseDtos(pomodoros);
 	}
 
-	public PomodoroSessionResponseDto createPomodoroSession(String username, PomodoroSessionDto dto) {
-		User user = userRepository.findByUsername(username).get();
+	public PomodoroSessionResponseDto createPomodoroSession(User user, PomodoroSessionDto dto) {
+		// User user = userRepository.findByUsername(username).get();
 		PomodoroSession pomodoro = pomodoroSessionMapper.pomodoroSessionDtoToPomodoroSession(user, dto);
 		PomodoroSession savedPomodoro = pomodoroSessionRepository.save(pomodoro);
 
 		return pomodoroSessionMapper.pomodoroSessionToPomodoroResponseDto(savedPomodoro);
 	}
 
-	public void updatePomodoroSession(Long pomodoroId, String durationType) {
+	public void updatePomodoroSession(Long pomodoroId, String sessionType) {
 		PomodoroSession pomodoro = pomodoroSessionRepository.findById(pomodoroId).orElseThrow(
 				() -> new EntityNotFoundException("Pomodoro not found with id " + pomodoroId));
 
-		if ("study".equalsIgnoreCase(durationType)) {
-			pomodoro.setStudyDuration(pomodoro.getStudyDuration() + 60);
-		} else if ("break".equalsIgnoreCase(durationType)) {
+		if ("task".equalsIgnoreCase(sessionType)) {
+			pomodoro.setTaskDuration(pomodoro.getTaskDuration() + 60);
+		} else if ("break".equalsIgnoreCase(sessionType)) {
 			pomodoro.setBreakDuration(pomodoro.getBreakDuration() + 60);
 		} else {
-			throw new IllegalArgumentException("Invalid duration type: " + durationType);
+			throw new IllegalArgumentException("Invalid session type: " + sessionType);
 		}
 
 		pomodoroSessionRepository.save(pomodoro);

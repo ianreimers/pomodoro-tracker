@@ -9,11 +9,11 @@ import jakarta.validation.constraints.NotNull;
 
 public record PomodoroSessionDto(
 		@NotNull UUID tempUuid,
-		@NotNull Integer studyDuration,
+		@NotNull Integer taskDuration,
 		@NotNull Integer breakDuration,
-		@NotNull Integer sessionStudyTime,
-		@NotNull Integer sessionShortBreakTime,
-		@NotNull Integer sessionLongBreakTime,
+		@NotNull Integer sessionTaskSeconds,
+		@NotNull Integer sessionShortBreakSeconds,
+		@NotNull Integer sessionLongBreakSeconds,
 		@NotNull ZonedDateTime sessionStartTime,
 		@NotNull ZonedDateTime sessionUpdateTime,
 		@NotNull BreakTypeEnum breakType) {

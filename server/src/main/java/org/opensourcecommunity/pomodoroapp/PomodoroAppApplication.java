@@ -53,14 +53,14 @@ public class PomodoroAppApplication {
 				PomodoroSession pomodoroSession = PomodoroSession.builder()
 						.user(responseUser)
 						.tempUuid(UUID.randomUUID())
-						.sessionStudyTime(userSettings.getTaskSeconds())
-						.sessionLongBreakTime(userSettings.getLongBreakSeconds())
-						.sessionShortBreakTime(userSettings.getShortBreakSeconds())
+						.sessionTaskSeconds(userSettings.getTaskSeconds())
+						.sessionLongBreakSeconds(userSettings.getLongBreakSeconds())
+						.sessionShortBreakSeconds(userSettings.getShortBreakSeconds())
 						.sessionStartTime(ZonedDateTime.now())
 						.sessionUpdateTime(ZonedDateTime.now())
 						.breakDuration(faker.number().numberBetween(0,
 								userSettings.getShortBreakSeconds()))
-						.studyDuration(faker.number().numberBetween(0,
+						.taskDuration(faker.number().numberBetween(0,
 								userSettings.getTaskSeconds()))
 						.breakType(BreakTypeEnum.SHORT)
 						.build();

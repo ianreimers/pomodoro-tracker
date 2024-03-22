@@ -33,14 +33,14 @@ import lombok.experimental.SuperBuilder;
 public class PomodoroSession extends BaseEntity {
 	@NotNull
 	private UUID tempUuid;
-	private Integer studyDuration;
+	private Integer taskDuration;
 	private Integer breakDuration;
 	@Column(nullable = false)
-	private Integer sessionStudyTime;
+	private Integer sessionTaskSeconds;
 	@Column(nullable = false)
-	private Integer sessionShortBreakTime;
+	private Integer sessionShortBreakSeconds;
 	@Column(nullable = false)
-	private Integer sessionLongBreakTime;
+	private Integer sessionLongBreakSeconds;
 	@Column(nullable = false)
 	private ZonedDateTime sessionStartTime;
 	@Column(nullable = false)

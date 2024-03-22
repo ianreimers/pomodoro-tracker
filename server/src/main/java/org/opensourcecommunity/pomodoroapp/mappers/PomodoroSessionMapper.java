@@ -16,11 +16,11 @@ public class PomodoroSessionMapper {
 		PomodoroSession pomodoro = new PomodoroSession();
 		pomodoro.setUser(user);
 		pomodoro.setTempUuid(dto.tempUuid());
-		pomodoro.setStudyDuration(dto.studyDuration());
+		pomodoro.setTaskDuration(dto.taskDuration());
 		pomodoro.setBreakDuration(dto.breakDuration());
-		pomodoro.setSessionStudyTime(dto.sessionStudyTime());
-		pomodoro.setSessionShortBreakTime(dto.sessionShortBreakTime());
-		pomodoro.setSessionLongBreakTime(dto.sessionLongBreakTime());
+		pomodoro.setSessionTaskSeconds(dto.sessionTaskSeconds());
+		pomodoro.setSessionShortBreakSeconds(dto.sessionShortBreakSeconds());
+		pomodoro.setSessionLongBreakSeconds(dto.sessionLongBreakSeconds());
 		pomodoro.setSessionStartTime(dto.sessionStartTime());
 		pomodoro.setSessionUpdateTime(dto.sessionUpdateTime());
 		pomodoro.setBreakType(dto.breakType());
@@ -32,11 +32,11 @@ public class PomodoroSessionMapper {
 		return new PomodoroSessionResponseDto(
 				pomodoroSession.getId(),
 				pomodoroSession.getTempUuid(),
-				pomodoroSession.getStudyDuration(),
+				pomodoroSession.getTaskDuration(),
 				pomodoroSession.getBreakDuration(),
-				pomodoroSession.getSessionStudyTime(),
-				pomodoroSession.getSessionShortBreakTime(),
-				pomodoroSession.getSessionLongBreakTime(),
+				pomodoroSession.getSessionTaskSeconds(),
+				pomodoroSession.getSessionShortBreakSeconds(),
+				pomodoroSession.getSessionLongBreakSeconds(),
 				pomodoroSession.getSessionStartTime(),
 				pomodoroSession.getSessionUpdateTime(),
 				pomodoroSession.getBreakType());

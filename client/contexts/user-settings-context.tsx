@@ -15,8 +15,8 @@ type UserContextProviderProps = {
 }
 
 
-const initialTaskTimeUnits = { hours: 0, mins: 0, secs: 4 };
-const initialShortBreakTimeUnits = { hours: 0, mins: 0, secs: 2 };
+const initialTaskTimeUnits = { hours: 0, mins: 1, secs: 4 };
+const initialShortBreakTimeUnits = { hours: 0, mins: 1, secs: 2 };
 const initialLongBreakTimeUnits = { hours: 0, mins: 0, secs: 5 };
 const initialState: UserSettingsState = {
 	taskTimeUnits: initialTaskTimeUnits,

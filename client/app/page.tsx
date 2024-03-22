@@ -11,15 +11,15 @@ import { usePomodoroContext } from "@/contexts/pomodoro-context";
 export default function Home() {
   const {
     remainingSeconds,
-    currSession,
+    currSessionType,
     isPlaying,
     totalPomodoros,
-    setIsPlaying
+    togglePlaying
   } = usePomodoroContext();
 
 
-  function handleToggleIsPlaying() {
-    setIsPlaying(!isPlaying);
+  function handleClick() {
+    togglePlaying();
   }
 
   return (
@@ -31,10 +31,10 @@ export default function Home() {
         </TabsList>
         <TabsContent value="session">
           <div className="flex flex-col items-center w-full bg-background">
-            <h2 className="text-4xl w-full text-center my-4 font-bold text-foreground underline">{title(currSession)}</h2>
+            <h2 className="text-4xl w-full text-center my-4 font-bold text-foreground underline">{title(currSessionType)}</h2>
             <p className="text-9xl mb-8 text-center w-full text-foreground">{secondsToTime(remainingSeconds)}</p>
             <h3 className="mb-4">Total Pomodoros: {totalPomodoros}</h3>
-            <Button size="lg" variant="default" onClick={handleToggleIsPlaying}>{isPlaying ? "Stop" : "Start"}</Button>
+            <Button size="lg" variant="default" onClick={handleClick}>{isPlaying ? "Stop" : "Start"}</Button>
           </div>
 
         </TabsContent>

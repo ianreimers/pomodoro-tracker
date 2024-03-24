@@ -48,7 +48,6 @@ public class PomodoroSessionMapper {
 		return pomodoros.stream()
 				.map(this::pomodoroSessionToPomodoroResponseDto)
 				.collect(Collectors.toList());
-
 	}
 
 }

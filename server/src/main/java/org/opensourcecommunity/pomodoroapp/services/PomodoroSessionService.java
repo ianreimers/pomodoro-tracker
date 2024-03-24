@@ -1,10 +1,13 @@
 package org.opensourcecommunity.pomodoroapp.services;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.opensourcecommunity.pomodoroapp.dtos.PomodoroSessionOverviewDto;
 import org.opensourcecommunity.pomodoroapp.dtos.PomodoroSessionDto;
 import org.opensourcecommunity.pomodoroapp.dtos.PomodoroSessionResponseDto;
+import org.opensourcecommunity.pomodoroapp.dtos.PomodoroSessionWeeklyDto;
 import org.opensourcecommunity.pomodoroapp.mappers.PomodoroSessionMapper;
 import org.opensourcecommunity.pomodoroapp.models.PomodoroSession;
 import org.opensourcecommunity.pomodoroapp.models.User;
@@ -13,6 +16,7 @@ import org.opensourcecommunity.pomodoroapp.repositories.UserRepository;
 import org.springframework.stereotype.Service;
 
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.persistence.Tuple;
 
 @Service
 public class PomodoroSessionService {
@@ -56,6 +60,33 @@ public class PomodoroSessionService {
 		}
 
 		pomodoroSessionRepository.save(pomodoro);
+	}
+
+	public PomodoroSessionOverviewDto getDailyTotal(User user) {
+		Integer dailyTotal = pomodoroSessionRepository.findDailyTotal(user.getId());
+		Tuple taskTotalsTuple = pomodoroSessionRepository.findSummaryTotals(user.getId());
+
+		PomodoroSessionOverviewDto dto = new PomodoroSessionOverviewDto(
+				dailyTotal,
+				taskTotalsTuple.get(0, Long.class),
+				taskTotalsTuple.get(1, Long.class),
+				taskTotalsTuple.get(2, Long.class));
+
+		return dto;
+	}
+
+	public List<PomodoroSessionWeeklyDto> getCurrentWeeklyAnalytics(User user) {
+		List<Tuple> currentWeekTuple = pomodoroSessionRepository.findCurrentWeekAnalytics(user.getId());
+
+		List<PomodoroSessionWeeklyDto> dto = currentWeekTuple.stream()
+				.map(a -> new PomodoroSessionWeeklyDto(
+						a.get(0, String.class),
+						a.get(1, Long.class),
+						a.get(2, Long.class),
+						a.get(3, Long.class)))
+				.collect(Collectors.toList());
+		return dto;
+
 	}
 
 }

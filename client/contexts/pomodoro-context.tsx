@@ -168,7 +168,7 @@ export default function PomodoroContextProvider({ children }: UserContextProvide
 			return response.data
 		},
 		onSuccess: (data) => {
-			console.log(data);
+			// The temp uuid will be replaced with the id the server sends back, for future updates
 			const newId = data.id as number;
 			dispatch({
 				type: "update_pomdoro_id",
@@ -220,7 +220,6 @@ export default function PomodoroContextProvider({ children }: UserContextProvide
 		// If we're logged in and at the start of a task, create a new pomodoro session with the server
 		if (isAuthenticated() && currSessionType === "task") {
 			if (taskSeconds === remainingSeconds) {
-				console.log("Attempting new pomdoro session creation");
 				mutationPost.mutate({
 					tempUuid: currPomodoroId as string,
 					breakType: currBreakType,

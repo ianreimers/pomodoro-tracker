@@ -7,7 +7,7 @@ import { handleError } from "@/helpers/error-handler";
 import { useRouter } from "next/navigation";
 
 const axiosInstance = axios.create({
-  baseURL: "http://localhost:8080/api",
+  baseURL: "http://localhost:8080/api/v1",
   headers: {
     "Content-Type": "application/json"
   }

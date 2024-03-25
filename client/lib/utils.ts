@@ -13,6 +13,7 @@ export function timeUnitsToSeconds({ hours, mins, secs }: TimeUnits) {
 
 }
 
+
 export function secondsToTime(seconds: number) {
   const secs = seconds % 60;
   const mins = Math.floor(seconds / 60) % 60;
@@ -35,11 +36,27 @@ export function title(words: string) {
   return word_arr.join(" ");
 }
 
-export function secondsToTimeUnits(seconds: number) {
+export function secondsToTimeUnits(seconds: number, withPadding: boolean = false) {
+  const secs = seconds % 60;
+  const mins = Math.floor(seconds / 60) % 60;
+  const hours = Math.floor(seconds / 60 / 60) % 24;
+
+  if (withPadding) {
+    const hours_str = hours.toString().padStart(2, "0")
+    const mins_str = mins.toString().padStart(2, "0")
+    const secs_str = secs.toString().padStart(2, "0")
+
+    return {
+      hours: hours_str,
+      mins: mins_str,
+      secs: secs_str
+    }
+  }
+
   return {
-    hours: Math.floor(seconds / 60 / 60) % 24,
-    mins: Math.floor(seconds / 60) % 60,
-    secs: seconds % 60,
+    hours,
+    mins,
+    secs
   }
 }
 

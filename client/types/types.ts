@@ -41,3 +41,28 @@ export interface UserSettingsState {
 
 }
 
+export type PomodoroTotalsAPIData = {
+  totalTasks: number;
+  totalTaskSeconds: number;
+  totalPomodoros: number;
+  totalSeconds: number;
+}
+
+export interface PomodoroTotalUIData {
+  totalTasks: {
+    title: String,
+    data: number
+  }
+  totalTaskSeconds: {
+    title: String,
+    data: string
+  }
+  totalPomodoros: {
+    title: String,
+    data: number
+  }
+  totalSeconds: {
+    title: String,
+    data: number
+  }
+}

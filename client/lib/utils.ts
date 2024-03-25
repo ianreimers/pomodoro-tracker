@@ -2,6 +2,7 @@ import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
 import { TimeUnits, UserSettings, UserSettingsState } from "@/types/types"
 import { UserSettingsFormData } from "@/validation_schema/schemas"
+import { PomodoroTotalsAPIData, PomodoroTotalUIData } from "@/types/types"
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -109,5 +110,27 @@ export function mapUserSettingsFormDataToState(settingsFormData: UserSettingsFor
     shortBreakTimeUnits,
     longBreakTimeUnits,
     pomodoroInterval
+  }
+}
+
+
+export function mapTotalDataToTodayUIData(data: PomodoroTotalsAPIData): PomodoroTotalUIData {
+  return {
+    totalTasks: {
+      title: "Tasks",
+      data: data.totalTasks
+    },
+    totalTaskSeconds: {
+      title: "Task Time",
+      data: secondsToTime(data.totalTaskSeconds)
+    },
+    totalPomodoros: {
+      title: "Pomodoros Completed",
+      data: data.totalPomodoros
+    },
+    totalSeconds: {
+      title: "Cumulative Time",
+      data: data.totalSeconds
+    }
   }
 }

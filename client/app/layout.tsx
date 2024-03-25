@@ -6,6 +6,7 @@ import { Toaster } from "@/components/ui/toaster";
 import Navbar from "@/components/main-nav";
 import UserSettingsContextProvider from "@/contexts/user-settings-context";
 import PomodoroContextProvider from "@/contexts/pomodoro-context";
+import { ThemeProvider } from "@/components/theme-provider";
 
 
 import App from "@/components/app";
@@ -27,17 +28,19 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${inter.className} bg-background`}>
         <App>
-          <AuthContextProvider>
-            <AxiosInterceptor>
-              <Navbar />
-              <UserSettingsContextProvider>
-                <PomodoroContextProvider>
-                  {children}
-                </PomodoroContextProvider>
-              </UserSettingsContextProvider>
-            </AxiosInterceptor>
-          </AuthContextProvider>
-          <Toaster />
+          <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+            <AuthContextProvider>
+              <AxiosInterceptor>
+                <Navbar />
+                <UserSettingsContextProvider>
+                  <PomodoroContextProvider>
+                    {children}
+                  </PomodoroContextProvider>
+                </UserSettingsContextProvider>
+              </AxiosInterceptor>
+            </AuthContextProvider>
+            <Toaster />
+          </ThemeProvider>
         </App>
       </body>
     </html>

@@ -63,6 +63,13 @@ export interface PomodoroTotalUIData {
   }
   totalSeconds: {
     title: String,
-    data: number
+    data: string
   }
+}
+
+export interface WeekAnalaytics {
+  dayOfTheWeek: String;
+  totalLongBreakSeconds: number;
+  totalShortBreakSeconds: number;
+  totalTaskSeconds: number;
 }

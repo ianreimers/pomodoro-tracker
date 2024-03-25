@@ -1,8 +1,27 @@
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
-import { TimeUnits, UserSettings, UserSettingsState } from "@/types/types"
+import { TimeUnits, UserSettings, UserSettingsState, WeekAnalaytics } from "@/types/types"
 import { UserSettingsFormData } from "@/validation_schema/schemas"
 import { PomodoroTotalsAPIData, PomodoroTotalUIData } from "@/types/types"
+import humanize from "humanize-duration"
+import humanizeDuration from "humanize-duration"
+
+const shortEnglishHumanizer = humanizeDuration.humanizer({
+  language: "shortEn",
+  spacer: "",
+  languages: {
+    shortEn: {
+      y: () => "y",
+      mo: () => "mo",
+      w: () => "w",
+      d: () => "d",
+      h: () => "h",
+      m: () => "m",
+      s: () => "s",
+      ms: () => "ms",
+    },
+  },
+})
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -13,6 +32,9 @@ export function timeUnitsToSeconds({ hours, mins, secs }: TimeUnits) {
 
 }
 
+function secondsToMinutes(seconds: number) {
+  return Math.floor(seconds / 60)
+}
 
 export function secondsToTime(seconds: number) {
   const secs = seconds % 60;
@@ -139,7 +161,7 @@ export function mapTotalDataToTodayUIData(data: PomodoroTotalsAPIData): Pomodoro
     },
     totalTaskSeconds: {
       title: "Task Time",
-      data: secondsToTime(data.totalTaskSeconds)
+      data: shortEnglishHumanizer(data.totalTaskSeconds * 1000)
     },
     totalPomodoros: {
       title: "Pomodoros Completed",
@@ -147,7 +169,50 @@ export function mapTotalDataToTodayUIData(data: PomodoroTotalsAPIData): Pomodoro
     },
     totalSeconds: {
       title: "Cumulative Time",
-      data: data.totalSeconds
+      data: shortEnglishHumanizer(data.totalSeconds * 1000)
     }
   }
+}
+
+export function mapWeekAnalyticsToChartData(data: WeekAnalaytics[]) {
+  const daysOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+  const chartData = [];
+
+  if (!data.length) {
+    for (let day of daysOfWeek) {
+      const dayObj = {
+        dayOfTheWeek: day,
+        totalTaskMinutes: 0,
+        totalShortBreakMinutes: 0,
+        totalLongBreakMinutes: 0
+      }
+      chartData.push(dayObj);
+    }
+    return chartData;
+  }
+  for (let i = 0; i < daysOfWeek.length; ++i) {
+    const day = daysOfWeek[i];
+
+    const potentialObj = data.find(obj => obj.dayOfTheWeek.trim() === day);
+
+    if (potentialObj) {
+      chartData.push({
+        dayOfTheWeek: day,
+        totalTaskMinutes: secondsToMinutes(potentialObj.totalTaskSeconds),
+        totalShortBreakMinutes: secondsToMinutes(potentialObj.totalShortBreakSeconds),
+        totalLongBreakMinutes: secondsToMinutes(potentialObj.totalLongBreakSeconds)
+
+      })
+      continue;
+    }
+
+    chartData.push({
+      dayOfTheWeek: day,
+      totalTaskMinutes: 0,
+      totalShortBreakMinutes: 0,
+      totalLongBreakMinutes: 0
+    });
+
+  }
+  return chartData;
 }

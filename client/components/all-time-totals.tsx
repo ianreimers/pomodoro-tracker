@@ -1,13 +1,10 @@
 import axiosInstance from "@/api/axiosInstance";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardTitle } from "./ui/card";
-import { cn, mapTotalDataToTodayUIData } from "@/lib/utils";
+import { mapTotalDataToTodayUIData } from "@/lib/utils";
 import { PomodoroTotalsAPIData, PomodoroTotalUIData } from "@/types/types";
 
 export function AllTimeTotals() {
-
-	const queryClient = useQueryClient();
-
 	const { data, isLoading, isError, isSuccess } = useQuery({
 		queryKey: ["allTimeTotal"],
 		queryFn: (): Promise<PomodoroTotalsAPIData> => axiosInstance.get("/pomodoro-sessions/analytics/all-time-totals").then(res => res.data)
@@ -22,7 +19,6 @@ export function AllTimeTotals() {
 	}
 
 	const uiData = mapTotalDataToTodayUIData(data);
-	//Object.keys(mapOverviewDataToUIData(data)) as Array<keyof PomodoroOverviewUIData>;
 
 	return (
 		<>
@@ -33,7 +29,7 @@ export function AllTimeTotals() {
 					(Object.keys(uiData) as Array<keyof PomodoroTotalUIData>).map(key => (
 						<Card key={key}>
 							<CardTitle >
-								<p className="text-base p-6 pb-1">{uiData[key].title}</p>
+								<p className="font-normal text-base p-6 pb-1">{uiData[key].title}</p>
 							</CardTitle>
 							<CardContent><p className="text-2xl font-bold">{uiData[key].data}</p></CardContent>
 

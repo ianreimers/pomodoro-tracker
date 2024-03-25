@@ -33,7 +33,7 @@ export default function TodayTotals() {
 					(Object.keys(uiData) as Array<keyof PomodoroTotalUIData>).map(key => (
 						<Card key={key}>
 							<CardTitle >
-								<p className="text-base p-6 pb-1">{uiData[key].title}</p>
+								<p className="font-normal text-base p-6 pb-1">{uiData[key].title}</p>
 							</CardTitle>
 							<CardContent><p className="text-2xl font-bold">{uiData[key].data}</p></CardContent>
 

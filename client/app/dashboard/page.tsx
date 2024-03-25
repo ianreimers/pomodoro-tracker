@@ -10,6 +10,7 @@ import { Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAx
 import tailwindConfig from "@/tailwind.config"
 import { PageWrapper } from "@/components/page-wrapper";
 import { AllTimeTotals } from "@/components/all-time-totals";
+import { mapWeekAnalyticsToChartData } from "@/lib/utils";
 
 const primaryColor = tailwindConfig.theme.extend.colors.primary.DEFAULT;
 const primaryColorForeground = tailwindConfig.theme.extend.colors.primary.foreground;
@@ -19,12 +20,6 @@ const mutedColor = tailwindConfig.theme.extend.colors.muted.foreground;
 const foregroundColor = tailwindConfig.theme.extend.colors.foreground;
 const destructiveColor = tailwindConfig.theme.extend.colors.destructive.DEFAULT;
 
-interface WeekAnalaytics {
-  dayOfTheWeek: String;
-  totalLongBreakSeconds: number;
-  totalShortBreakSeconds: number;
-  totalTaskSeconds: number;
-}
 
 function DashboardPage() {
 
@@ -42,50 +37,6 @@ function DashboardPage() {
     return <p>Error retreiving week analytics</p>
   }
 
-  function mapWeekAnalyticsToChartData(data: WeekAnalaytics[]) {
-    const daysOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
-    const chartData = [];
-
-    if (!data.length) {
-      for (let day of daysOfWeek) {
-        const dayObj: WeekAnalaytics = {
-          dayOfTheWeek: day,
-          totalTaskSeconds: 0,
-          totalShortBreakSeconds: 0,
-          totalLongBreakSeconds: 0
-        }
-        chartData.push(dayObj);
-      }
-      return chartData;
-    }
-
-    for (let i = 0; i < daysOfWeek.length; ++i) {
-      const day = daysOfWeek[i];
-
-      const potentialObj = data.find(obj => obj.dayOfTheWeek.trim() === day);
-
-      if (potentialObj) {
-        chartData.push({ ...potentialObj, name: potentialObj.dayOfTheWeek })
-        continue;
-      }
-
-      chartData.push({
-        dayOfTheWeek: day,
-        totalTaskSeconds: 0,
-        totalShortBreakSeconds: 0,
-        totalLongBreakSeconds: 0
-      });
-
-    }
-    return chartData;
-  }
-
-  const weekChartData = mapWeekAnalyticsToChartData(data);
-  console.log(data);
-  console.log(weekChartData);
-
-
-
 
   return (
     <PageWrapper>
@@ -93,18 +44,20 @@ function DashboardPage() {
         <h1 className="text-4xl font-bold">Dashboard</h1>
         <TodayTotals />
         <Card>
-          <CardHeader><p>Weekly Totals</p></CardHeader>
+          <CardHeader>
+            <p className="text-xl font-semibold">Week Totals</p>
+          </CardHeader>
           <CardContent>
             <ResponsiveContainer className="mt-4" width="100%" height={450} >
-              <BarChart data={weekChartData}>
+              <BarChart data={mapWeekAnalyticsToChartData(data)}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="dayOfTheWeek" />
-                <YAxis />
+                <YAxis label={{ value: "Minutes", angle: -90, position: "insideLeft" }} />
                 <Tooltip contentStyle={{ backgroundColor: primaryColorForeground }} />
                 <Legend />
-                <Bar dataKey="totalTaskSeconds" name="Task Seconds" fill={primaryColor} />
-                <Bar dataKey="totalShortBreakSeconds" name="Short Break" fill={mutedColor} />
-                <Bar dataKey="totalLongBreakSeconds" name="Long Break" fill={destructiveColor} />
+                <Bar dataKey="totalTaskMinutes" name="Task Minutes" fill={primaryColor} />
+                <Bar dataKey="totalShortBreakMinutes" name="Short Break" fill={mutedColor} />
+                <Bar dataKey="totalLongBreakMinutes" name="Long Break" fill={destructiveColor} />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>

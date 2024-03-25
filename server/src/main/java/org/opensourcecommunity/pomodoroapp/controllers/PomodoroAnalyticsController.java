@@ -2,7 +2,8 @@ package org.opensourcecommunity.pomodoroapp.controllers;
 
 import java.util.List;
 
-import org.opensourcecommunity.pomodoroapp.dtos.PomodoroSessionOverviewDto;
+import org.opensourcecommunity.pomodoroapp.dtos.PomodoroSessionAllTimeDto;
+import org.opensourcecommunity.pomodoroapp.dtos.PomodoroSessionTodayOverviewDto;
 import org.opensourcecommunity.pomodoroapp.dtos.PomodoroSessionWeeklyDto;
 import org.opensourcecommunity.pomodoroapp.models.User;
 import org.opensourcecommunity.pomodoroapp.services.PomodoroSessionService;
@@ -22,10 +23,18 @@ public class PomodoroAnalyticsController {
 		this.pomodoroSessionService = pomodoroSessionService;
 	}
 
-	@GetMapping("/daily-total")
-	public ResponseEntity<?> getTotalTaskTime(Authentication auth) {
+	@GetMapping("/today-totals")
+	public ResponseEntity<?> getTodayTotals(Authentication auth) {
 		User user = (User) auth.getPrincipal();
-		PomodoroSessionOverviewDto dailtyTotal = pomodoroSessionService.getDailyTotal(user);
+		PomodoroSessionTodayOverviewDto dailtyTotal = pomodoroSessionService.getTodayTotals(user);
+
+		return ResponseEntity.ok(dailtyTotal);
+	}
+
+	@GetMapping("/all-time-totals")
+	public ResponseEntity<?> getAllTimeTotals(Authentication auth) {
+		User user = (User) auth.getPrincipal();
+		PomodoroSessionAllTimeDto dailtyTotal = pomodoroSessionService.getAllTimeTotals(user);
 
 		return ResponseEntity.ok(dailtyTotal);
 	}

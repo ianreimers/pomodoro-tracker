@@ -17,31 +17,45 @@ public interface PomodoroSessionRepository extends JpaRepository<PomodoroSession
 
 	public User findUserByUserId(Long userId);
 
-	@Query(value = "SELECT COUNT(ps) AS dailyTotal " +
-			"FROM pomodoro_sessions ps " +
-			"WHERE ps.user_id = :userId AND DATE(ps.session_start_time) = CURRENT_DATE", nativeQuery = true)
-	public Integer findDailyTotal(Long userId);
+	@Query(value = "SELECT "
+			+ "COUNT(ps) AS totalTasks, "
+			+ "COALESCE(SUM(ps.task_duration), 0) AS totalTaskSeconds, "
+			+ "COALESCE(SUM(CASE ps.break_type "
+			+ "   WHEN 'SHORT' THEN "
+			+ "       CASE "
+			+ "           WHEN ps.task_duration = ps.session_task_seconds AND ps.session_short_break_seconds = ps.break_duration THEN 1 "
+			+ "           ELSE 0 "
+			+ "       END "
+			+ "   WHEN 'LONG' THEN "
+			+ "       CASE "
+			+ "           WHEN ps.task_duration = ps.session_task_seconds AND ps.session_long_break_seconds = ps.break_duration THEN 1 "
+			+ "           ELSE 0 "
+			+ "       END "
+			+ "   END), 0) AS totalPomodoros, "
+			+ "COALESCE(SUM(ps.task_duration + ps.break_duration), 0) AS totalSeconds "
+			+ "FROM pomodoro_sessions ps "
+			+ "WHERE ps.user_id = :userId AND DATE(ps.session_start_time) = CURRENT_DATE", nativeQuery = true)
+	public Tuple findTodayTotal(Long userId);
 
 	@Query(value = "SELECT "
-			+ "sum(ps.task_duration) AS totalTaskTime, "
-			+ "sum(CASE "
-			+ "    WHEN ps.task_duration = ps.session_task_seconds THEN 1 "
-			+ "    ELSE 0 "
-			+ "END) AS totalCompletedTasks, "
-			+ "sum(CASE ps.break_type "
-			+ "    WHEN 'SHORT' THEN "
-			+ "        CASE "
-			+ "            WHEN ps.task_duration = ps.session_task_seconds AND ps.session_short_break_seconds = ps.break_duration THEN 1 "
-			+ "            ELSE 0 "
-			+ "        END "
-			+ "    WHEN 'LONG' THEN "
-			+ "        CASE "
-			+ "            WHEN ps.task_duration = ps.session_task_seconds AND ps.session_long_break_seconds = ps.break_duration THEN 1 "
-			+ "            ELSE 0 "
-			+ "        END "
-			+ "END) AS totalCompletedPomodoros "
-			+ "FROM pomodoro_sessions ps WHERE ps.user_id = :userId", nativeQuery = true)
-	public Tuple findSummaryTotals(Long userId);
+			+ "COUNT(ps) AS totalTasks, "
+			+ "COALESCE(SUM(ps.task_duration), 0) AS totalTaskSeconds, "
+			+ "COALESCE(SUM(CASE ps.break_type "
+			+ "   WHEN 'SHORT' THEN "
+			+ "       CASE "
+			+ "           WHEN ps.task_duration = ps.session_task_seconds AND ps.session_short_break_seconds = ps.break_duration THEN 1 "
+			+ "           ELSE 0 "
+			+ "       END "
+			+ "   WHEN 'LONG' THEN "
+			+ "       CASE "
+			+ "           WHEN ps.task_duration = ps.session_task_seconds AND ps.session_long_break_seconds = ps.break_duration THEN 1 "
+			+ "           ELSE 0 "
+			+ "       END "
+			+ "   END), 0) AS totalPomodoros, "
+			+ "COALESCE(SUM(ps.task_duration + ps.break_duration), 0) AS totalSeconds "
+			+ "FROM pomodoro_sessions ps "
+			+ "WHERE ps.user_id = :userId", nativeQuery = true)
+	public Tuple findAllTimeTotals(Long userId);
 
 	@Query(value = "SELECT " +
 			"  TO_CHAR(session_start_time, 'Day') AS dayOfTheWeek, " +

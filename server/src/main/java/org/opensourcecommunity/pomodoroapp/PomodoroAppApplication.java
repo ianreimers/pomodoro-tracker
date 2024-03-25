@@ -77,11 +77,14 @@ public class PomodoroAppApplication {
 						.sessionShortBreakSeconds(userSettings.getShortBreakSeconds())
 						.sessionStartTime(sessionStartTime)
 						.sessionUpdateTime(sessionUpdateTime)
-						.breakDuration(faker.number().numberBetween(0,
-								userSettings.getShortBreakSeconds()))
-						.taskDuration(faker.number().numberBetween(0,
-								userSettings.getTaskSeconds()))
-						.breakType(BreakTypeEnum.SHORT)
+						.breakDuration(day.getValue() % 2 == 0 ? faker.number().numberBetween(0,
+								userSettings.getShortBreakSeconds())
+								: userSettings.getShortBreakSeconds())
+						.taskDuration(day.getValue() % 2 == 0 ? faker.number().numberBetween(0,
+								userSettings.getTaskSeconds())
+								: userSettings.getTaskSeconds())
+						.breakType(day.getValue() % 2 == 0 ? BreakTypeEnum.SHORT
+								: BreakTypeEnum.LONG)
 						.build();
 				pomodoroSessionRepository.save(pomodoroSession);
 

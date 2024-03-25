@@ -4,7 +4,8 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.opensourcecommunity.pomodoroapp.dtos.PomodoroSessionOverviewDto;
+import org.opensourcecommunity.pomodoroapp.dtos.PomodoroSessionTodayOverviewDto;
+import org.opensourcecommunity.pomodoroapp.dtos.PomodoroSessionAllTimeDto;
 import org.opensourcecommunity.pomodoroapp.dtos.PomodoroSessionDto;
 import org.opensourcecommunity.pomodoroapp.dtos.PomodoroSessionResponseDto;
 import org.opensourcecommunity.pomodoroapp.dtos.PomodoroSessionWeeklyDto;
@@ -62,15 +63,26 @@ public class PomodoroSessionService {
 		pomodoroSessionRepository.save(pomodoro);
 	}
 
-	public PomodoroSessionOverviewDto getDailyTotal(User user) {
-		Integer dailyTotal = pomodoroSessionRepository.findDailyTotal(user.getId());
-		Tuple taskTotalsTuple = pomodoroSessionRepository.findSummaryTotals(user.getId());
+	public PomodoroSessionTodayOverviewDto getTodayTotals(User user) {
+		Tuple todayTotalsTuple = pomodoroSessionRepository.findTodayTotal(user.getId());
 
-		PomodoroSessionOverviewDto dto = new PomodoroSessionOverviewDto(
-				dailyTotal,
-				taskTotalsTuple.get(0, Long.class),
-				taskTotalsTuple.get(1, Long.class),
-				taskTotalsTuple.get(2, Long.class));
+		PomodoroSessionTodayOverviewDto dto = new PomodoroSessionTodayOverviewDto(
+				todayTotalsTuple.get(0, Long.class),
+				todayTotalsTuple.get(1, Long.class),
+				todayTotalsTuple.get(2, Long.class),
+				todayTotalsTuple.get(3, Long.class));
+
+		return dto;
+	}
+
+	public PomodoroSessionAllTimeDto getAllTimeTotals(User user) {
+		Tuple allTimeTotalsTuple = pomodoroSessionRepository.findAllTimeTotals(user.getId());
+
+		PomodoroSessionAllTimeDto dto = new PomodoroSessionAllTimeDto(
+				allTimeTotalsTuple.get(0, Long.class),
+				allTimeTotalsTuple.get(1, Long.class),
+				allTimeTotalsTuple.get(2, Long.class),
+				allTimeTotalsTuple.get(3, Long.class));
 
 		return dto;
 	}

@@ -1,0 +1,31 @@
+services:
+  web:
+    build: 
+      context: ./client/.
+      args:
+        - NEXT_PUBLIC_API_BASE_URL=${NEXT_PUBLIC_API_BASE_URL}
+    container_name: pomodoro-web
+    depends_on:
+      - api
+    ports:
+      - "3000:3000"
+  api:
+    build: ./server/.
+    container_name: pomodoro-api
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
+      SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
+    depends_on:
+      - postgres
+  postgres:
+    image: postgres
+    container_name: pomodoro_db
+    environment:
+      POSTGRES_USER: ${SPRING_DATASOURCE_USERNAME}
+      POSTGRES_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
+      POSTGRES_DB: pomodoro_db
+    ports:
+      - "5433:5432"

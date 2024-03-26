@@ -1,6 +1,6 @@
 "use client";
 
-import { Dispatch, SetStateAction, createContext, useContext, useEffect, useReducer, useState } from "react";
+import { createContext, useContext, useEffect, useReducer } from "react";
 import { useUserSettingsContext } from "./user-settings-context";
 import { useMutation } from "@tanstack/react-query";
 import axiosInstance from "@/api/axiosInstance";
@@ -18,7 +18,9 @@ interface PomodoroContextType {
 	currSessionType: SessionType;
 	isPlaying: boolean;
 	totalPomodoros: number;
+	resetCycle: () => void,
 	togglePlaying: () => void;
+	skipSession: () => void;
 };
 
 interface PomodoroReducerState {
@@ -65,6 +67,12 @@ type ACTION =
 			pomodoroInterval: number
 		}
 	}
+	| {
+		type: "reset_cycle", payload: {
+			taskSeconds: number,
+			pomodoroInterval: number
+		}
+	}
 	| { type: "toggle_playing" }
 
 
@@ -74,7 +82,7 @@ function reducer(state: PomodoroReducerState, action: ACTION): PomodoroReducerSt
 			return {
 				...state,
 				remainingSeconds: state.remainingSeconds - 1,
-				intervalTimeRemaining: 0
+				intervalTimeRemaining: 1000
 			}
 		case "duration_remaining":
 			return {
@@ -88,7 +96,7 @@ function reducer(state: PomodoroReducerState, action: ACTION): PomodoroReducerSt
 			}
 		case "switch_session": {
 			let nextState: PomodoroReducerState = { ...state };
-			nextState.intervalTimeRemaining = 0;
+			nextState.intervalTimeRemaining = 1000;
 			nextState.isPlaying = true;
 			nextState.currBreakType = "SHORT";
 
@@ -112,6 +120,16 @@ function reducer(state: PomodoroReducerState, action: ACTION): PomodoroReducerSt
 			}
 			return nextState;
 		}
+		case "reset_cycle":
+			return {
+				remainingSeconds: action.payload.taskSeconds,
+				intervalTimeRemaining: 1000,
+				isPlaying: false,
+				totalPomodoros: 0,
+				currSessionType: "task",
+				currPomodoroId: crypto.randomUUID(),
+				currBreakType: action.payload.pomodoroInterval === 1 ? "LONG" : "SHORT"
+			}
 		case "update_pomdoro_id":
 			return {
 				...state,
@@ -124,7 +142,7 @@ function reducer(state: PomodoroReducerState, action: ACTION): PomodoroReducerSt
 				currSessionType: "task",
 				currBreakType: action.payload.pomodoroInterval === 1 ? "LONG" : "SHORT",
 				isPlaying: false,
-				intervalTimeRemaining: 0,
+				intervalTimeRemaining: 1000,
 				currPomodoroId: crypto.randomUUID()
 			}
 		}
@@ -136,7 +154,6 @@ function reducer(state: PomodoroReducerState, action: ACTION): PomodoroReducerSt
 	}
 }
 
-
 export const PomodoroContext = createContext<PomodoroContextType | null>(null);
 
 export default function PomodoroContextProvider({ children }: UserContextProviderProps) {
@@ -144,7 +161,7 @@ export default function PomodoroContextProvider({ children }: UserContextProvide
 	const { isAuthenticated } = useAuthContext();
 	const [state, dispatch] = useReducer(reducer, {
 		remainingSeconds: taskSeconds,
-		intervalTimeRemaining: 0,
+		intervalTimeRemaining: 1000,
 		isPlaying: false,
 		totalPomodoros: 0,
 		currSessionType: "task",
@@ -195,6 +212,28 @@ export default function PomodoroContextProvider({ children }: UserContextProvide
 	function togglePlaying() {
 		dispatch({
 			type: "toggle_playing"
+		})
+	}
+
+	function resetCycle() {
+		dispatch({
+			type: "reset_cycle",
+			payload: {
+				taskSeconds,
+				pomodoroInterval
+			}
+		})
+	}
+
+	function skipSession() {
+		dispatch({
+			type: "switch_session",
+			payload: {
+				taskSeconds,
+				shortBreakSeconds,
+				longBreakSeconds,
+				pomodoroInterval
+			}
 		})
 	}
 
@@ -254,12 +293,14 @@ export default function PomodoroContextProvider({ children }: UserContextProvide
 		// Capture the moment, in millis, that this second began
 		let startTime = Date.now();
 
-		// Calculate the current intervalDelay from any previous remaining time
-		let intervalDelay = 1000 - intervalTimeRemaining
+		// Used to decide wheather to calculate any remaining time on component unmount
+		let intervalCompleted = false;
 
 
 		const intervalId = setInterval(() => {
 			// If end of session, change to next session state
+			intervalCompleted = true;
+
 			if (remainingSeconds === 0) {
 				dispatch({
 					type: "switch_session",
@@ -274,23 +315,23 @@ export default function PomodoroContextProvider({ children }: UserContextProvide
 				dispatch({ type: "complete_interval" });
 			}
 
-		}, intervalDelay); // The delay is when the user paused in (second - timeRemaining)
+		}, intervalTimeRemaining); // The delay is when the user paused in (second - timeRemaining)
 
 		return () => {
 			const stopTime = Date.now();
 			const milliDiff = stopTime - startTime;
+			const remainingMilli = intervalTimeRemaining - milliDiff <= 0 ?
+				1000 : intervalTimeRemaining - milliDiff;
 
-			if (milliDiff < 1000) {
-				//setIntervalTimeRemaining((prev) => prev + milliDiff > 1000 ? milliDiff : milliDiff + prev);
+			if (!intervalCompleted) {
 				dispatch({
 					type: "duration_remaining",
 					payload: {
-						intervalTimeRemaining: (intervalTimeRemaining + milliDiff > 1000
-							? milliDiff
-							: milliDiff + intervalTimeRemaining
-						)
+						intervalTimeRemaining: remainingMilli
 					}
+
 				})
+
 			}
 
 			// Clear the interval upon unmount
@@ -303,13 +344,17 @@ export default function PomodoroContextProvider({ children }: UserContextProvide
 		currSessionType,
 		isPlaying,
 		totalPomodoros,
-		togglePlaying
+		resetCycle,
+		togglePlaying,
+		skipSession
 	}
 
 	return (
-		<PomodoroContext.Provider value={contextValue}>
-			{children}
-		</PomodoroContext.Provider>
+		<>
+			<PomodoroContext.Provider value={contextValue}>
+				{children}
+			</PomodoroContext.Provider>
+		</>
 	)
 }
 

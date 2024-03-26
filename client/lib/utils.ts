@@ -161,11 +161,11 @@ export function mapUserSettingsFormDataToState(settingsFormData: UserSettingsFor
 export function mapTotalDataToTodayUIData(data: PomodoroTotalsAPIData): PomodoroTotalUIData {
   return {
     totalTasks: {
-      title: "Tasks",
+      title: "Tasks Completed",
       data: data.totalTasks
     },
     totalTaskSeconds: {
-      title: "Task Time",
+      title: "Total Task Time",
       data: shortEnglishHumanizer(data.totalTaskSeconds * 1000)
     },
     totalPomodoros: {

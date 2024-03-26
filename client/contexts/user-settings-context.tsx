@@ -2,7 +2,7 @@
 
 import { useToast } from "@/components/ui/use-toast";
 import { mapSettingsToState, mapUserSettingsFormDataToState, secondsToTimeUnits, timeUnitsToSeconds } from "@/lib/utils";
-import { TimeUnits, UserSettings, UserSettingsState } from "@/types/types";
+import { TimeUnitNums, UserSettings, UserSettingsState } from "@/types/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createContext, useContext, useEffect, useReducer } from "react";
 import { useAuthContext } from "./auth-context";
@@ -32,9 +32,9 @@ interface UserSettingsContextType {
 	taskSeconds: number;
 	shortBreakSeconds: number;
 	longBreakSeconds: number;
-	taskTimeUnits: TimeUnits;
-	shortBreakTimeUnits: TimeUnits;
-	longBreakTimeUnits: TimeUnits;
+	taskTimeUnits: TimeUnitNums;
+	shortBreakTimeUnits: TimeUnitNums;
+	longBreakTimeUnits: TimeUnitNums;
 	pomodoroInterval: number;
 	updateSettings: (newSettings: UserSettingsFormData) => void
 }
@@ -128,9 +128,9 @@ export default function UserSettingsContextProvider({ children }: UserContextPro
 					taskSeconds,
 					shortBreakSeconds,
 					longBreakSeconds,
-					shortBreakTimeUnits: secondsToTimeUnits(shortBreakSeconds),
-					longBreakTimeUnits: secondsToTimeUnits(longBreakSeconds),
-					taskTimeUnits: secondsToTimeUnits(taskSeconds),
+					shortBreakTimeUnits: secondsToTimeUnits(shortBreakSeconds, false),
+					longBreakTimeUnits: secondsToTimeUnits(longBreakSeconds, false),
+					taskTimeUnits: secondsToTimeUnits(taskSeconds, false),
 					pomodoroInterval
 				}
 			})

@@ -1,6 +1,6 @@
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
-import { TimeUnits, UserSettings, UserSettingsState, WeekAnalaytics } from "@/types/types"
+import { TimeUnitNums, TimeUnitStrs, UserSettings, UserSettingsState, WeekAnalaytics } from "@/types/types"
 import { UserSettingsFormData } from "@/validation_schema/schemas"
 import { PomodoroTotalsAPIData, PomodoroTotalUIData } from "@/types/types"
 import humanize from "humanize-duration"
@@ -27,7 +27,7 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-export function timeUnitsToSeconds({ hours, mins, secs }: TimeUnits) {
+export function timeUnitsToSeconds({ hours, mins, secs }: TimeUnitNums) {
   return secs + (mins * 60) + (hours * 60 * 60)
 
 }
@@ -58,28 +58,33 @@ export function title(words: string) {
   return word_arr.join(" ");
 }
 
-export function secondsToTimeUnits(seconds: number, withPadding: boolean = false) {
+export function secondsToTimeUnits(seconds: number, withPadding: false): TimeUnitNums;
+export function secondsToTimeUnits(seconds: number, withPadding: true): TimeUnitStrs;
+export function secondsToTimeUnits(seconds: number, withPadding: boolean): TimeUnitNums | TimeUnitStrs {
   const secs = seconds % 60;
   const mins = Math.floor(seconds / 60) % 60;
   const hours = Math.floor(seconds / 60 / 60) % 24;
 
   if (withPadding) {
-    const hours_str = hours.toString().padStart(2, "0")
-    const mins_str = mins.toString().padStart(2, "0")
-    const secs_str = secs.toString().padStart(2, "0")
-
-    return {
+    const hours_str = hours.toString().padStart(2, "0");
+    const mins_str = mins.toString().padStart(2, "0");
+    const secs_str = secs.toString().padStart(2, "0");
+    const obj: TimeUnitStrs = {
       hours: hours_str,
       mins: mins_str,
       secs: secs_str
-    }
+    };
+
+
+    return obj;
   }
 
-  return {
+  const obj: TimeUnitNums = {
     hours,
     mins,
     secs
-  }
+  };
+  return obj;
 }
 
 export function mapSettingsToState(settings: UserSettings): UserSettingsState {
@@ -87,9 +92,9 @@ export function mapSettingsToState(settings: UserSettings): UserSettingsState {
     taskSeconds: settings.taskSeconds,
     shortBreakSeconds: settings.shortBreakSeconds,
     longBreakSeconds: settings.longBreakSeconds,
-    taskTimeUnits: secondsToTimeUnits(settings.taskSeconds),
-    shortBreakTimeUnits: secondsToTimeUnits(settings.shortBreakSeconds),
-    longBreakTimeUnits: secondsToTimeUnits(settings.longBreakSeconds),
+    taskTimeUnits: secondsToTimeUnits(settings.taskSeconds, false),
+    shortBreakTimeUnits: secondsToTimeUnits(settings.shortBreakSeconds, false),
+    longBreakTimeUnits: secondsToTimeUnits(settings.longBreakSeconds, false),
     pomodoroInterval: settings.pomodoroInterval
   }
 }
@@ -168,7 +173,7 @@ export function mapTotalDataToTodayUIData(data: PomodoroTotalsAPIData): Pomodoro
       data: data.totalPomodoros
     },
     totalSeconds: {
-      title: "Cumulative Time",
+      title: "Total Time",
       data: shortEnglishHumanizer(data.totalSeconds * 1000)
     }
   }

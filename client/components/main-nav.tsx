@@ -5,9 +5,8 @@ import Link from 'next/link';
 import { Button } from './ui/button';
 import ThemeToggleButton from './theme-toggle-button';
 import { Sheet, SheetContent, SheetTrigger } from './ui/sheet';
-import { CircleUser, Menu, Package2, Search } from 'lucide-react';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@radix-ui/react-dropdown-menu';
-import { Input } from './ui/input';
+import { Menu, Package2 } from 'lucide-react';
+import Icon1 from './icons/icon1';
 
 const Navbar = () => {
 	const { logout, isAuthenticated } = useAuthContext();
@@ -19,14 +18,9 @@ const Navbar = () => {
 					href="/"
 					className="flex items-center gap-2 text-lg font-semibold md:text-base"
 				>
-					<Package2 className="h-6 w-6" />
+					{/*<Package2 className="h-6 w-6" />*/}
+					<Icon1 className="w-10 h-10" />
 					<span className="sr-only">Acme Inc</span>
-				</Link>
-				<Link
-					href="/"
-					className="text-foreground transition-colors hover:text-foreground"
-				>
-					Home
 				</Link>
 				{isAuthenticated() ? (
 					<>
@@ -46,7 +40,6 @@ const Navbar = () => {
 					</>
 				)}
 			</nav>
-
 			<Sheet>
 				<SheetTrigger asChild>
 					<Button
@@ -64,14 +57,9 @@ const Navbar = () => {
 							href="/"
 							className="flex items-center gap-2 text-lg font-semibold"
 						>
-							<Package2 className="h-6 w-6" />
+							{/*<Package2 className="h-6 w-6" />*/}
+							<Icon1 className="w-10 h-10" />
 							<span className="sr-only">Acme Inc</span>
-						</Link>
-						<Link
-							href="/"
-							className="hover:text-foreground"
-						>
-							Home
 						</Link>
 						{isAuthenticated() ? (
 							<>

@@ -5,7 +5,7 @@ import { mapTotalDataToTodayUIData } from "@/lib/utils";
 import { PomodoroTotalsAPIData, PomodoroTotalUIData } from "@/types/types";
 
 export function AllTimeTotals() {
-	const { data, isLoading, isError, isSuccess } = useQuery({
+	const { data, isLoading, isError } = useQuery({
 		queryKey: ["allTimeTotal"],
 		queryFn: (): Promise<PomodoroTotalsAPIData> => axiosInstance.get("/pomodoro-sessions/analytics/all-time-totals").then(res => res.data)
 	});
@@ -22,8 +22,6 @@ export function AllTimeTotals() {
 
 	return (
 		<>
-
-			<h2 className="text-2xl font-bold">All Time</h2>
 			<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
 				{
 					(Object.keys(uiData) as Array<keyof PomodoroTotalUIData>).map(key => (

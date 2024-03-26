@@ -1,14 +1,12 @@
 import axiosInstance from "@/api/axiosInstance";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardTitle } from "./ui/card";
-import { cn, mapTotalDataToTodayUIData } from "@/lib/utils";
+import { mapTotalDataToTodayUIData } from "@/lib/utils";
 import { PomodoroTotalsAPIData, PomodoroTotalUIData } from "@/types/types";
 
 
 export default function TodayTotals() {
-	const queryClient = useQueryClient();
-
-	const { data, isLoading, isError, isSuccess } = useQuery({
+	const { data, isLoading, isError } = useQuery({
 		queryKey: ["dailyTotal"],
 		queryFn: (): Promise<PomodoroTotalsAPIData> => axiosInstance.get("/pomodoro-sessions/analytics/today-totals").then(res => res.data)
 	});
@@ -22,12 +20,10 @@ export default function TodayTotals() {
 	}
 
 	const uiData = mapTotalDataToTodayUIData(data);
-	//Object.keys(mapOverviewDataToUIData(data)) as Array<keyof PomodoroOverviewUIData>;
 
 	return (
 		<>
 
-			<h2 className="text-2xl font-bold">Today</h2>
 			<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
 				{
 					(Object.keys(uiData) as Array<keyof PomodoroTotalUIData>).map(key => (

@@ -7,7 +7,7 @@ import { handleError } from "@/helpers/error-handler";
 import { useRouter } from "next/navigation";
 
 const axiosInstance = axios.create({
-  baseURL: "http://localhost:8080/api/v1",
+  baseURL: `${process.env.NEXT_PUBLIC_API_BASE_URL}`,
   headers: {
     "Content-Type": "application/json"
   }
@@ -15,13 +15,12 @@ const axiosInstance = axios.create({
 
 function AxiosInterceptor({ children }: { children: React.ReactNode }) {
   const [isSet, setIsSet] = useState(false);
-  const router = useRouter();
   const { logout, isAuthenticated } = useAuthContext();
   const { toast } = useToast();
 
   /*
     *
-    * As of right now, the server only returns and array of error messages
+    * As of right now, the server only returns an array of error messages
     * for the errors that are handled
     * {
     *   "errors": string[]

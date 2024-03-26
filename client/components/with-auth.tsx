@@ -1,24 +1,20 @@
-
-
+"use client"
 import { useRouter } from 'next/navigation';
-import Router from 'next/router';
 import { FunctionComponent, useEffect } from 'react';
 import { useAuthContext } from '@/contexts/auth-context';
 
-const withAuth = (WrappedComponent: FunctionComponent) => {
-	return (props: any) => {
+export default function withAuth(WrappedComponent: FunctionComponent) {
+	return function WithAuth(props: any) {
 		const router = useRouter();
-		const { isAuthenticated, isLoading } = useAuthContext(); // Assuming your AuthContext provides these
+		const { isAuthenticated, isLoading } = useAuthContext();
 
 		useEffect(() => {
 			if (!isLoading && !isAuthenticated()) {
-				// Redirect them to the login page, but save the current location they were trying to go to.
 				router.push(`/login`);
 			}
-		}, [isAuthenticated, isLoading, Router]);
+		}, [isAuthenticated, isLoading, router]);
 
 		return isAuthenticated() ? <WrappedComponent {...props} /> : null; // Or a loading indicator
 	};
 };
 
-export default withAuth;

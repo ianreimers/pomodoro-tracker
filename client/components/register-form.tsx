@@ -1,5 +1,3 @@
-
-import { FormEvent, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthContext } from '@/contexts/auth-context';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -23,8 +21,7 @@ const formSchema = z.object({
 });
 
 export default function RegisterForm() {
-	const [credentials, setCredentials] = useState({ username: '', password: '' });
-	const { register } = useAuthContext();
+	const { register, isAuthenticated } = useAuthContext();
 	const router = useRouter();
 
 	const form = useForm<z.infer<typeof formSchema>>({
@@ -35,6 +32,11 @@ export default function RegisterForm() {
 			email: ""
 		}
 	})
+
+	if (isAuthenticated()) {
+		router.back();
+		return <p>Redirecting...</p>
+	}
 
 	async function onSubmit(values: z.infer<typeof formSchema>) {
 		try {

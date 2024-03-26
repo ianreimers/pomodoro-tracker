@@ -1,10 +1,16 @@
 
 export type SessionType = "task" | "short break" | "long break";
 
-export interface TimeUnits {
-  hours: number
-  mins: number,
-  secs: number,
+export interface TimeUnitNums {
+  hours: number;
+  mins: number;
+  secs: number;
+}
+
+export interface TimeUnitStrs {
+  hours: string;
+  mins: string;
+  secs: string;
 }
 
 export interface UserSettings {
@@ -34,9 +40,9 @@ export interface UserSettingsState {
   taskSeconds: number;
   shortBreakSeconds: number;
   longBreakSeconds: number;
-  taskTimeUnits: TimeUnits;
-  shortBreakTimeUnits: TimeUnits;
-  longBreakTimeUnits: TimeUnits;
+  taskTimeUnits: TimeUnitNums;
+  shortBreakTimeUnits: TimeUnitNums;
+  longBreakTimeUnits: TimeUnitNums;
   pomodoroInterval: number;
 
 }

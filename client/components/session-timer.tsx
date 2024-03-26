@@ -30,7 +30,7 @@ export default function SessionTimer() {
 	}
 	return (
 		<div className="flex flex-col items-center w-full bg-background">
-			<h2 className="text-4xl w-full text-center my-4 font-bold text-foreground underline">{title(currSessionType)}</h2>
+			<h2 className="text-4xl w-full text-center mb-4 font-bold text-foreground underline">{title(currSessionType)}</h2>
 			<div className="flex items-center tabular-nums justify-center text-7xl sm:text-8xl lg:text-9xl p-6 mb-4 text-center w-full text-foreground">
 				<span className="border-accent border-solid border-4 border-b-[10px] rounded-xl p-2 flex items-center justify-center">{timeUnits.hours}</span>
 				<span className="text-6xl sm:text-7xl lg:text-8xl sm:px-0.5">:</span>

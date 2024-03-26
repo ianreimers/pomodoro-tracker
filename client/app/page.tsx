@@ -11,7 +11,7 @@ export default function Home() {
     <PageWrapper>
       <div className="max-w-4xl mx-auto">
         <Tabs defaultValue="session">
-          <TabsList className="grid w-full grid-cols-2 h-12">
+          <TabsList className="grid w-full grid-cols-2 h-12 mb-6">
             <TabsTrigger className="py-2 text-base" value="session">Session</TabsTrigger>
             <TabsTrigger className="py-2 text-base" value="settings">Settings</TabsTrigger>
           </TabsList>

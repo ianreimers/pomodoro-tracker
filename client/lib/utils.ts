@@ -132,18 +132,18 @@ export function mapUserSettingsFormDataToState(settingsFormData: UserSettingsFor
   const taskTimeUnits = {
     hours: taskTimeHours,
     mins: taskTimeMinutes,
-    secs: taskTimeSeconds
+    secs: taskTimeSeconds || 0
   };
   const shortBreakTimeUnits = {
     hours: shortBreakHours,
     mins: shortBreakMinutes,
-    secs: shortBreakSeconds,
+    secs: shortBreakSeconds || 0,
 
   };
   const longBreakTimeUnits = {
     hours: longBreakHours,
     mins: longBreakMinutes,
-    secs: longBreakSeconds,
+    secs: longBreakSeconds || 0,
   };
 
   return {

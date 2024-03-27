@@ -6,6 +6,7 @@ import { useMutation } from "@tanstack/react-query";
 import axiosInstance from "@/api/axiosInstance";
 import { useToast } from "@/components/ui/use-toast";
 import { useAuthContext } from "./auth-context";
+import useAudioPlayer from "@/hooks/use-audio-player";
 
 type UserContextProviderProps = {
 	children: React.ReactNode;
@@ -143,7 +144,7 @@ function reducer(state: PomodoroReducerState, action: ACTION): PomodoroReducerSt
 				currBreakType: action.payload.pomodoroInterval === 1 ? "LONG" : "SHORT",
 				isPlaying: false,
 				intervalTimeRemaining: 1000,
-				currPomodoroId: crypto.randomUUID()
+				currPomodoroId: crypto.randomUUID(),
 			}
 		}
 		case "toggle_playing":
@@ -157,7 +158,7 @@ function reducer(state: PomodoroReducerState, action: ACTION): PomodoroReducerSt
 export const PomodoroContext = createContext<PomodoroContextType | null>(null);
 
 export default function PomodoroContextProvider({ children }: UserContextProviderProps) {
-	const { taskSeconds, shortBreakSeconds, longBreakSeconds, pomodoroInterval } = useUserSettingsContext();
+	const { taskSeconds, shortBreakSeconds, longBreakSeconds, pomodoroInterval, sound } = useUserSettingsContext();
 	const { isAuthenticated } = useAuthContext();
 	const [state, dispatch] = useReducer(reducer, {
 		remainingSeconds: taskSeconds,
@@ -169,6 +170,7 @@ export default function PomodoroContextProvider({ children }: UserContextProvide
 		currBreakType: pomodoroInterval === 1 ? "LONG" : "SHORT"
 	});
 	const { toast } = useToast()
+	const { playSound } = useAudioPlayer(sound);
 	const {
 		remainingSeconds,
 		intervalTimeRemaining,
@@ -201,7 +203,7 @@ export default function PomodoroContextProvider({ children }: UserContextProvide
 		mutationFn: async (data: { sessionType: string, id: string | number }) => await axiosInstance.patch(`/pomodoro-sessions/${data.id}`, { sessionType: data.sessionType }),
 		onSuccess: () => {
 			toast({
-				description: `Pomodoro ${currPomodoroId} updated`
+				description: `Pomodoro updated`
 			})
 		},
 		onError: (error) => {
@@ -249,7 +251,7 @@ export default function PomodoroContextProvider({ children }: UserContextProvide
 			}
 		})
 
-	}, [taskSeconds, shortBreakSeconds, longBreakSeconds, pomodoroInterval]);
+	}, [taskSeconds, shortBreakSeconds, longBreakSeconds, pomodoroInterval, sound]);
 
 	useEffect(() => {
 		if (!isPlaying) {
@@ -302,6 +304,7 @@ export default function PomodoroContextProvider({ children }: UserContextProvide
 			intervalCompleted = true;
 
 			if (remainingSeconds === 0) {
+				playSound(sound);
 				dispatch({
 					type: "switch_session",
 					payload: {
@@ -319,9 +322,13 @@ export default function PomodoroContextProvider({ children }: UserContextProvide
 
 		return () => {
 			const stopTime = Date.now();
-			const milliDiff = stopTime - startTime;
-			const remainingMilli = intervalTimeRemaining - milliDiff <= 0 ?
-				1000 : intervalTimeRemaining - milliDiff;
+
+			let milliDiff = stopTime - startTime;
+			milliDiff = milliDiff > 1000 ? 1000 : milliDiff;
+
+			let remainingMilli = intervalTimeRemaining - milliDiff;
+			remainingMilli = remainingMilli <= 0 ?
+				1000 : remainingMilli;
 
 			if (!intervalCompleted) {
 				dispatch({

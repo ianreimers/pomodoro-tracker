@@ -32,6 +32,9 @@ public class UserSettings extends BaseEntity {
 	@Column(nullable = false, columnDefinition = "INT DEFAULT 4")
 	@Builder.Default
 	private Integer pomodoroInterval = 4;
+	@Column(nullable = false, columnDefinition = "TEXT DEFAULT 'bells'")
+	@Builder.Default
+	private String sound = "bells";
 
 	@OneToOne
 	@JoinColumn(name = "user_id")

@@ -6,6 +6,10 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useUserSettingsContext } from '@/contexts/user-settings-context';
 import { userSettingsFormSchema } from '@/validation_schema/schemas';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
+import { useRef } from 'react';
+import useAudioPlayer from '@/hooks/use-audio-player';
+import { title } from '@/lib/utils';
 
 /*
 
@@ -66,8 +70,10 @@ export default function UserSettingsForm() {
 		shortBreakTimeUnits,
 		longBreakTimeUnits,
 		pomodoroInterval,
+		sound,
 		updateSettings
 	} = useUserSettingsContext();
+	const { playSound } = useAudioPlayer();
 
 	const form = useForm<z.infer<typeof userSettingsFormSchema>>({
 		resolver: zodResolver(userSettingsFormSchema),
@@ -79,6 +85,7 @@ export default function UserSettingsForm() {
 			longBreakHours: longBreakTimeUnits.hours,
 			longBreakMinutes: longBreakTimeUnits.mins,
 			pomodoroInterval,
+			sound,
 			taskTimeSeconds: 0,
 			shortBreakSeconds: 0,
 			longBreakSeconds: 0,
@@ -87,6 +94,10 @@ export default function UserSettingsForm() {
 
 	function onSubmit(values: z.infer<typeof userSettingsFormSchema>) {
 		updateSettings(values);
+	}
+
+	function handleSoundSelectChange(sound: string) {
+		playSound(sound);
 	}
 
 
@@ -195,6 +206,35 @@ export default function UserSettingsForm() {
 						)}
 					/>
 				</fieldset>
+				<FormField
+					control={form.control}
+					name="sound"
+					render={({ field }) => (
+						<FormItem className='col-span-full'>
+							<FormLabel className='text-md font-extrabold'>Sound</FormLabel>
+							<Select onValueChange={(value) => {
+								field.onChange(value);
+								handleSoundSelectChange(value);
+							}}
+								defaultValue={field.value}
+							>
+								<FormControl>
+									<SelectTrigger className="">
+										<SelectValue />
+									</SelectTrigger>
+								</FormControl>
+								<SelectContent>
+									<SelectItem value="bells">Bells</SelectItem>
+									<SelectItem value="congas">Congas</SelectItem>
+									<SelectItem value="ringtone">Ringtone</SelectItem>
+									<SelectItem value="shakers">Shakers</SelectItem>
+									<SelectItem value="triangle">Triangle</SelectItem>
+								</SelectContent>
+							</Select>
+							<FormMessage />
+						</FormItem>
+					)}
+				/>
 				<Button size="lg" type="submit" className="text-base col-span-full mt-4">Submit</Button>
 			</form>
 		</Form>

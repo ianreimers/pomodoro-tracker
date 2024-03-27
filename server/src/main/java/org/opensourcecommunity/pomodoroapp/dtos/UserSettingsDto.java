@@ -7,5 +7,6 @@ public record UserSettingsDto(
 		@NotNull @Min(1) Integer taskSeconds,
 		@NotNull @Min(1) Integer shortBreakSeconds,
 		@NotNull @Min(2) Integer longBreakSeconds,
-		@NotNull @Min(1) Integer pomodoroInterval) {
+		@NotNull @Min(1) Integer pomodoroInterval,
+		@NotNull String sound) {
 }

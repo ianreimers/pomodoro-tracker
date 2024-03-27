@@ -13,7 +13,8 @@ public class UserSettingsMapper {
 				userSettings.getTaskSeconds(),
 				userSettings.getShortBreakSeconds(),
 				userSettings.getLongBreakSeconds(),
-				userSettings.getPomodoroInterval());
+				userSettings.getPomodoroInterval(),
+				userSettings.getSound());
 	}
 
 	public UserSettings userSettingsDtoToUserSettings(UserSettingsDto dto, User user) {
@@ -23,6 +24,7 @@ public class UserSettingsMapper {
 				.shortBreakSeconds(dto.shortBreakSeconds())
 				.longBreakSeconds(dto.longBreakSeconds())
 				.pomodoroInterval(dto.pomodoroInterval())
+				.sound(dto.sound())
 				.user(user)
 				.build();
 	}

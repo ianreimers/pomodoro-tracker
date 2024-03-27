@@ -25,7 +25,8 @@ const initialState: UserSettingsState = {
 	taskSeconds: timeUnitsToSeconds(initialTaskTimeUnits),
 	shortBreakSeconds: timeUnitsToSeconds(initialShortBreakTimeUnits),
 	longBreakSeconds: timeUnitsToSeconds(initialLongBreakTimeUnits),
-	pomodoroInterval: 4
+	pomodoroInterval: 4,
+	sound: "bells"
 }
 
 interface UserSettingsContextType {
@@ -36,6 +37,7 @@ interface UserSettingsContextType {
 	shortBreakTimeUnits: TimeUnitNums;
 	longBreakTimeUnits: TimeUnitNums;
 	pomodoroInterval: number;
+	sound: string;
 	updateSettings: (newSettings: UserSettingsFormData) => void
 }
 
@@ -66,7 +68,8 @@ export default function UserSettingsContextProvider({ children }: UserContextPro
 		taskTimeUnits,
 		shortBreakTimeUnits,
 		longBreakTimeUnits,
-		pomodoroInterval
+		pomodoroInterval,
+		sound
 	} = state;
 
 	const { data: userSettings, isLoading, error } = useQuery({
@@ -131,7 +134,8 @@ export default function UserSettingsContextProvider({ children }: UserContextPro
 					shortBreakTimeUnits: secondsToTimeUnits(shortBreakSeconds, false),
 					longBreakTimeUnits: secondsToTimeUnits(longBreakSeconds, false),
 					taskTimeUnits: secondsToTimeUnits(taskSeconds, false),
-					pomodoroInterval
+					pomodoroInterval,
+					sound
 				}
 			})
 		}
@@ -153,7 +157,8 @@ export default function UserSettingsContextProvider({ children }: UserContextPro
 			taskSeconds: newState.taskSeconds,
 			shortBreakSeconds: newState.shortBreakSeconds,
 			longBreakSeconds: newState.longBreakSeconds,
-			pomodoroInterval: newState.pomodoroInterval
+			pomodoroInterval: newState.pomodoroInterval,
+			sound: newState.sound
 		})
 	}
 
@@ -165,6 +170,7 @@ export default function UserSettingsContextProvider({ children }: UserContextPro
 		shortBreakTimeUnits,
 		longBreakTimeUnits,
 		pomodoroInterval,
+		sound,
 		updateSettings
 	}
 

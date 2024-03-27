@@ -3,7 +3,6 @@ import { twMerge } from "tailwind-merge"
 import { TimeUnitNums, TimeUnitStrs, UserSettings, UserSettingsState, WeekAnalaytics } from "@/types/types"
 import { UserSettingsFormData } from "@/validation_schema/schemas"
 import { PomodoroTotalsAPIData, PomodoroTotalUIData } from "@/types/types"
-import humanize from "humanize-duration"
 import humanizeDuration from "humanize-duration"
 
 const shortEnglishHumanizer = humanizeDuration.humanizer({
@@ -95,7 +94,8 @@ export function mapSettingsToState(settings: UserSettings): UserSettingsState {
     taskTimeUnits: secondsToTimeUnits(settings.taskSeconds, false),
     shortBreakTimeUnits: secondsToTimeUnits(settings.shortBreakSeconds, false),
     longBreakTimeUnits: secondsToTimeUnits(settings.longBreakSeconds, false),
-    pomodoroInterval: settings.pomodoroInterval
+    pomodoroInterval: settings.pomodoroInterval,
+    sound: settings.sound
   }
 }
 
@@ -104,13 +104,15 @@ export function mapUserSettingsFormDataToRequest(settingsFormData: UserSettingsF
     taskSeconds,
     shortBreakSeconds,
     longBreakSeconds,
-    pomodoroInterval } = mapUserSettingsFormDataToState(settingsFormData);
+    pomodoroInterval,
+    sound } = mapUserSettingsFormDataToState(settingsFormData);
 
   return {
     taskSeconds,
     shortBreakSeconds,
     longBreakSeconds,
-    pomodoroInterval
+    pomodoroInterval,
+    sound
   }
 }
 
@@ -125,8 +127,8 @@ export function mapUserSettingsFormDataToState(settingsFormData: UserSettingsFor
     longBreakHours,
     longBreakMinutes,
     longBreakSeconds,
-    pomodoroInterval
-
+    pomodoroInterval,
+    sound
   } = settingsFormData;
 
   const taskTimeUnits = {
@@ -153,7 +155,8 @@ export function mapUserSettingsFormDataToState(settingsFormData: UserSettingsFor
     taskTimeUnits,
     shortBreakTimeUnits,
     longBreakTimeUnits,
-    pomodoroInterval
+    pomodoroInterval,
+    sound
   }
 }
 

@@ -6,7 +6,7 @@ import { Button } from './ui/button';
 import ThemeToggleButton from './theme-toggle-button';
 import { Sheet, SheetContent, SheetTrigger } from './ui/sheet';
 import { Menu, Package2 } from 'lucide-react';
-import Icon1 from './icons/icon1';
+import Logo from './icons/icon4';
 
 const Navbar = () => {
 	const { logout, isAuthenticated } = useAuthContext();
@@ -19,8 +19,8 @@ const Navbar = () => {
 					className="flex items-center gap-2 text-lg font-semibold md:text-base"
 				>
 					{/*<Package2 className="h-6 w-6" />*/}
-					<Icon1 className="w-10 h-10" />
-					<span className="sr-only">Acme Inc</span>
+					<Logo className="w-10 h-10" />
+					<span className="sr-only">Pomodoro App Logo</span>
 				</Link>
 				{isAuthenticated() ? (
 					<>
@@ -57,9 +57,8 @@ const Navbar = () => {
 							href="/"
 							className="flex items-center gap-2 text-lg font-semibold"
 						>
-							{/*<Package2 className="h-6 w-6" />*/}
-							<Icon1 className="w-10 h-10" />
-							<span className="sr-only">Acme Inc</span>
+							<Logo className="w-10 h-10" />
+							<span className="sr-only">Pomodoro App Logo</span>
 						</Link>
 						{isAuthenticated() ? (
 							<>
@@ -88,41 +87,3 @@ const Navbar = () => {
 };
 
 export default Navbar;
-
-// return (
-// 	<nav className='bg-background flex justify-between items-center max-w-[97%] mx-auto'>
-// 		<h1>Logo</h1>
-// 		<div className='flex justify-center items-center'>
-// 			<ThemeToggleButton className='mr-8' />
-// 			<ul className='flex items-center justify-end min-h-[10vh] gap-10 text-primary-foreground'>
-// 				<li>
-// 					<Link href="/" className='p-4 bg-primary hover:bg-primary/90 rounded-md'>
-// 						Home
-// 					</Link>
-// 				</li>
-// 				{isAuthenticated() ? (
-// 					<>
-// 						<Link href={"/dashboard"} className='p-4  bg-primary hover:bg-primary/90 rounded-md'>
-// 							Dashboard
-// 						</Link>
-// 						<Button onClick={() => logout()}>Logout</Button>
-// 					</>
-// 				) : (
-// 					<>
-// 						<li>
-// 							<Link href="/login" className='p-4 bg-primary hover:bg-primary/90 rounded-md'>
-// 								Login
-// 							</Link>
-// 						</li>
-// 						<li>
-// 							<Link href="/register" className='p-4 bg-primary hover:bg-primary/90 rounded-md mr-5'>
-// 								Register
-// 							</Link>
-// 						</li>
-// 					</>
-// 				)}
-// 			</ul>
-// 		</div>
-// 	</nav>
-// );
-

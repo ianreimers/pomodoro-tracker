@@ -18,6 +18,7 @@ export interface UserSettings {
   shortBreakSeconds: number;
   longBreakSeconds: number;
   pomodoroInterval: number;
+  sound: string;
 }
 
 export interface AuthenticatedUser {
@@ -44,6 +45,7 @@ export interface UserSettingsState {
   shortBreakTimeUnits: TimeUnitNums;
   longBreakTimeUnits: TimeUnitNums;
   pomodoroInterval: number;
+  sound: string;
 
 }
 

@@ -59,9 +59,6 @@ export default function LoginForm() {
 							<FormControl>
 								<Input placeholder="Username" {...field} />
 							</FormControl>
-							<FormDescription>
-								This is your public display name.
-							</FormDescription>
 							<FormMessage />
 						</FormItem>
 					)}

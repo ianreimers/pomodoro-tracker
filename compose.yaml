@@ -9,6 +9,8 @@ services:
       - api
     ports:
       - "3000:3000"
+    networks:
+      - my-network
   api:
     build: ./server/.
     container_name: pomodoro-api
@@ -18,9 +20,12 @@ services:
       SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
       SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
       SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
     depends_on:
       - postgres
-  postgres:
+    networks:
+      - my-network
+  db:
     image: postgres
     container_name: pomodoro_db
     environment:
@@ -29,3 +34,10 @@ services:
       POSTGRES_DB: pomodoro_db
     ports:
       - "5433:5432"
+    networks:
+      - my-network
+
+networks:
+  my-network:
+    name: my-network
+    external: true

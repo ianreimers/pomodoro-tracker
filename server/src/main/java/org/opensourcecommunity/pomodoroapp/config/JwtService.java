@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -19,8 +20,13 @@ import io.jsonwebtoken.security.Keys;
 @Service
 public class JwtService {
 
+	@Value("${jwt.secret}")
+	private String SECRET_KEY;
+
+	// The key is hard coded below for quick local development
 	// Retreive actual secret key from application properties
-	private static final String SECRET_KEY = "VQirijZUa7yqu1BgAVE4hSvfHsmXDs4LNfI1kItySviK2wX8HRsKqsl40Y+nToFM";
+	// private static final String SECRET_KEY =
+	// "VQirijZUa7yqu1BgAVE4hSvfHsmXDs4LNfI1kItySviK2wX8HRsKqsl40Y+nToFM";
 
 	public String extractUsername(String token) {
 		return extractClaim(token, Claims::getSubject);

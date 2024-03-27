@@ -1,6 +1,5 @@
 import { useEffect, useRef } from "react";
 
-
 export default function useAudioPlayer(sound: string | undefined = "bells") {
 	const audioRef = useRef<HTMLAudioElement>(new Audio());
 

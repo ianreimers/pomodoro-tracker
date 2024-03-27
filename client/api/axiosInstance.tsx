@@ -1,10 +1,8 @@
 "use client"
-import axios, { isAxiosError, Axios, AxiosError, AxiosResponse } from "axios";
-import { AuthContext, useAuthContext } from "@/contexts/auth-context";
-import { useContext, useEffect, useState } from "react";
+import axios, { AxiosError } from "axios";
+import { useAuthContext } from "@/contexts/auth-context";
+import { useEffect, useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
-import { handleError } from "@/helpers/error-handler";
-import { useRouter } from "next/navigation";
 
 const axiosInstance = axios.create({
   baseURL: `${process.env.NEXT_PUBLIC_API_BASE_URL}`,

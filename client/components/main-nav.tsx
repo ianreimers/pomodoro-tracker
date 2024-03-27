@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { Button } from './ui/button';
 import ThemeToggleButton from './theme-toggle-button';
 import { Sheet, SheetContent, SheetTrigger } from './ui/sheet';
-import { Menu, Package2 } from 'lucide-react';
+import { Menu } from 'lucide-react';
 import Logo from './icons/logo';
 
 const Navbar = () => {
@@ -18,7 +18,6 @@ const Navbar = () => {
 					href="/"
 					className="flex items-center gap-2 text-lg font-semibold md:text-base"
 				>
-					{/*<Package2 className="h-6 w-6" />*/}
 					<Logo className="w-10 h-10" />
 					<span className="sr-only">Pomodoro App Logo</span>
 				</Link>

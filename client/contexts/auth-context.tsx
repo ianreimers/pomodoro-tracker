@@ -4,8 +4,8 @@ import { useRouter } from "next/navigation";
 import { createContext, useContext, useState, useEffect, useReducer, Reducer, ReducerAction } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import axiosInstance from "@/api/axiosInstance";
-import { UserSettings, AuthenticatedUser, User, RegistrationData } from "@/types/types";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { AuthenticatedUser, User, RegistrationData } from "@/types/types";
+import { useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 
 type AuthContextProviderProps = {

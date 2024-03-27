@@ -16,7 +16,7 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Pomodoro",
-  description: "A pomodoro technique based application for tracking your pomodoro session",
+  description: "A pomodoro technique based application for tracking your pomodoro sessions",
 };
 
 export default function RootLayout({

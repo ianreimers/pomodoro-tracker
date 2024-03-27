@@ -24,8 +24,6 @@ export default function Home() {
 
         </Tabs>
       </div>
-
-
     </PageWrapper>
 
   )

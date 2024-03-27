@@ -1,15 +1,13 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useUserSettingsContext } from '@/contexts/user-settings-context';
 import { userSettingsFormSchema } from '@/validation_schema/schemas';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
-import { useRef } from 'react';
 import useAudioPlayer from '@/hooks/use-audio-player';
-import { title } from '@/lib/utils';
 
 /*
 

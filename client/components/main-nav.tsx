@@ -6,7 +6,7 @@ import { Button } from './ui/button';
 import ThemeToggleButton from './theme-toggle-button';
 import { Sheet, SheetContent, SheetTrigger } from './ui/sheet';
 import { Menu, Package2 } from 'lucide-react';
-import Logo from './icons/icon4';
+import Logo from './icons/logo';
 
 const Navbar = () => {
 	const { logout, isAuthenticated } = useAuthContext();

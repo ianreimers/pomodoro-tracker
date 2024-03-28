@@ -8,7 +8,7 @@ services:
     depends_on:
       - api
     ports:
-      - "3000:3000"
+      - "3001:3000"
     networks:
       - my-network
   api:
@@ -25,9 +25,9 @@ services:
       - postgres
     networks:
       - my-network
-  db:
+  postgres:
     image: postgres
-    container_name: pomodoro_db
+    container_name: db
     environment:
       POSTGRES_USER: ${SPRING_DATASOURCE_USERNAME}
       POSTGRES_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}

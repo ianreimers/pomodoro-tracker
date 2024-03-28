@@ -5,9 +5,11 @@ import { mapSettingsToState, mapUserSettingsFormDataToState, secondsToTimeUnits,
 import { TimeUnitNums, UserSettings, UserSettingsState } from "@/types/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createContext, useContext, useEffect, useReducer } from "react";
-import { useAuthContext } from "./auth-context";
+import { useAuthContext } from "@/contexts/auth/auth-context";
 import axiosInstance from "@/api/axiosInstance";
 import { UserSettingsFormData } from "@/validation_schema/schemas";
+import { isEqual } from "lodash";
+
 
 
 type UserContextProviderProps = {
@@ -99,13 +101,11 @@ export default function UserSettingsContextProvider({ children }: UserContextPro
 	// Even though we can just use react query's context, sharing state
 	// allows unauthenticted users to still use the app
 	useEffect(() => {
+
 		if (userSettings) {
 			dispatch({
 				type: "update_settings",
 				payload: mapSettingsToState(userSettings)
-			})
-			toast({
-				description: "Your settings are now synced"
 			})
 		} else {
 			dispatch({
@@ -141,9 +141,14 @@ export default function UserSettingsContextProvider({ children }: UserContextPro
 		}
 	}, [isAuthenticated]);
 
-
 	function updateSettings(newSettings: UserSettingsFormData) {
 		const newState = mapUserSettingsFormDataToState(newSettings);
+
+		if (!isEqual(newState, state)) {
+			toast({
+				description: "Your settings are updated"
+			})
+		}
 
 		if (!isAuthenticated()) {
 			dispatch({

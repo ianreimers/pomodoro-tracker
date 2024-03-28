@@ -4,35 +4,15 @@ import { useRouter } from "next/navigation";
 import { createContext, useContext, useState, useEffect, useReducer, Reducer, ReducerAction } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import axiosInstance from "@/api/axiosInstance";
-import { AuthenticatedUser, User, RegistrationData } from "@/types/types";
+import { AuthenticatedUser, User, RegistrationData, AuthContextType, AuthState, Credentials } from "@/types/types";
 import { useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
+import { reducer } from "./auth-reducer";
 
 type AuthContextProviderProps = {
 	children: React.ReactNode
 }
 
-interface Credentials {
-	username: string;
-	password: string;
-}
-
-
-interface AuthContextType {
-	user: User | null;
-	isLoading: boolean;
-	login: (credentials: Credentials) => Promise<void>;
-	register: (data: RegistrationData) => Promise<void>;
-	logout: () => void;
-	isAuthenticated: () => boolean;
-}
-
-interface AuthState {
-	user: User | null;
-	token: string;
-	isLoading: boolean;
-
-}
 
 const initialState: AuthState = {
 	user: null,
@@ -40,38 +20,7 @@ const initialState: AuthState = {
 	isLoading: false,
 }
 
-
-type ACTIONTYPE =
-	| { type: "register_success", payload: { user: User; token: string; } }
-	| { type: "login_success", payload: { user: User; token: string } }
-	| { type: "register_fail" }
-	| { type: "logout" };
-
-function reducer(state: AuthState, action: ACTIONTYPE): AuthState {
-	switch (action.type) {
-		case "login_success":
-		case "register_success":
-			return {
-				...state,
-				user: action.payload.user,
-				token: action.payload.token,
-			}
-		case "register_fail":
-			return {
-				...state,
-			}
-		case "logout":
-			return {
-				user: null,
-				token: "",
-				isLoading: false
-			}
-	}
-}
-
-
 export const AuthContext = createContext<AuthContextType | null>(null);
-
 
 export default function AuthContextProvider({ children }: AuthContextProviderProps) {
 	const [state, dispatch] = useReducer(reducer, initialState);

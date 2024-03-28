@@ -1,6 +1,6 @@
 "use client";
 
-import { useAuthContext } from '@/contexts/auth-context';
+import { useAuthContext } from '@/contexts/auth/auth-context';
 import Link from 'next/link';
 import { Button } from './ui/button';
 import ThemeToggleButton from './theme-toggle-button';

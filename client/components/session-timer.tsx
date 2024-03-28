@@ -1,4 +1,4 @@
-import { usePomodoroContext } from "@/contexts/pomodoro-context";
+import { usePomodoroContext } from "@/contexts/pomodoro/pomodoro-context";
 import { secondsToTimeUnits, title } from "@/lib/utils";
 import { Button } from "./ui/button";
 import { Pause, Play, RefreshCcw, SkipForward } from "lucide-react";

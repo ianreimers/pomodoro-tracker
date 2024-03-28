@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css"
-import AuthContextProvider from "@/contexts/auth-context";
+import AuthContextProvider from "@/contexts/auth/auth-context";
 import { Toaster } from "@/components/ui/toaster";
 import Navbar from "@/components/main-nav";
 import UserSettingsContextProvider from "@/contexts/user-settings-context";
-import PomodoroContextProvider from "@/contexts/pomodoro-context";
+import PomodoroContextProvider from "@/contexts/pomodoro/pomodoro-context";
 import { ThemeProvider } from "@/components/theme-provider";
 
 

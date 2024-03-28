@@ -1,5 +1,5 @@
 import { useRouter } from 'next/navigation';
-import { useAuthContext } from '@/contexts/auth-context';
+import { useAuthContext } from '@/contexts/auth/auth-context';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';

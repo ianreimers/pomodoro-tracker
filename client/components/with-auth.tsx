@@ -1,7 +1,7 @@
 "use client"
 import { useRouter } from 'next/navigation';
 import { FunctionComponent, useEffect } from 'react';
-import { useAuthContext } from '@/contexts/auth-context';
+import { useAuthContext } from '@/contexts/auth/auth-context';
 
 export default function withAuth(WrappedComponent: FunctionComponent) {
 	return function WithAuth(props: any) {

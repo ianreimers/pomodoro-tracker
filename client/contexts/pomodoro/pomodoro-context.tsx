@@ -162,7 +162,6 @@ export default function PomodoroContextProvider({ children }: UserContextProvide
 			// Check if we need to switch to the next session or decrement remaining seconds
 			if (remainingSeconds === 0) {
 				playSound(sound);
-				console.log("Attempting to play sound:", sound)
 				dispatch({
 					type: "switch_session",
 					payload: {

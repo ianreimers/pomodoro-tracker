@@ -144,11 +144,14 @@ export default function UserSettingsContextProvider({ children }: UserContextPro
 	function updateSettings(newSettings: UserSettingsFormData) {
 		const newState = mapUserSettingsFormDataToState(newSettings);
 
-		if (!isEqual(newState, state)) {
-			toast({
-				description: "Your settings are updated"
-			})
+		// State is the same so don't do anything
+		if (isEqual(newState, state)) {
+			return
 		}
+
+		toast({
+			description: "Your settings are updated"
+		})
 
 		if (!isAuthenticated()) {
 			dispatch({

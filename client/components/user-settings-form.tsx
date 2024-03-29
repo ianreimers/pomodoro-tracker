@@ -166,8 +166,8 @@ export default function UserSettingsForm() {
 					control={form.control}
 					name="pomodoroInterval"
 					render={({ field }) => (
-						<FormItem className='space-y-8'>
-							<FormLabel className='text-md font-extrabold'>Pomodoro Interval</FormLabel>
+						<FormItem>
+							<FormLabel className='text-md font-extrabold mb-6 inline-block'>Pomodoro Interval</FormLabel>
 							<FormControl>
 								<Input {...field} />
 							</FormControl>

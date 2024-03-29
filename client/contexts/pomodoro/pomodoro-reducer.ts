@@ -1,3 +1,4 @@
+import { PomodoroReducerState } from "@/types/types"
 
 type ACTION =
 	| { type: "complete_interval" }

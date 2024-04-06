@@ -1,104 +1,126 @@
 package org.opensourcecommunity.pomodoroapp.services;
 
-import java.time.LocalDate;
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.persistence.Tuple;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import org.opensourcecommunity.pomodoroapp.dtos.PomodoroSessionTodayOverviewDto;
 import org.opensourcecommunity.pomodoroapp.dtos.PomodoroSessionAllTimeDto;
 import org.opensourcecommunity.pomodoroapp.dtos.PomodoroSessionDto;
 import org.opensourcecommunity.pomodoroapp.dtos.PomodoroSessionResponseDto;
+import org.opensourcecommunity.pomodoroapp.dtos.PomodoroSessionTodayOverviewDto;
 import org.opensourcecommunity.pomodoroapp.dtos.PomodoroSessionWeeklyDto;
 import org.opensourcecommunity.pomodoroapp.mappers.PomodoroSessionMapper;
 import org.opensourcecommunity.pomodoroapp.models.PomodoroSession;
 import org.opensourcecommunity.pomodoroapp.models.User;
 import org.opensourcecommunity.pomodoroapp.repositories.PomodoroSessionRepository;
 import org.opensourcecommunity.pomodoroapp.repositories.UserRepository;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-
-import jakarta.persistence.EntityNotFoundException;
-import jakarta.persistence.Tuple;
 
 @Service
 public class PomodoroSessionService {
-	PomodoroSessionRepository pomodoroSessionRepository;
-	PomodoroSessionMapper pomodoroSessionMapper;
-	UserRepository userRepository;
+  PomodoroSessionRepository pomodoroSessionRepository;
+  PomodoroSessionMapper pomodoroSessionMapper;
+  UserRepository userRepository;
 
-	public PomodoroSessionService(PomodoroSessionRepository pomodoroSessionRepository,
-			PomodoroSessionMapper pomodoroSessionMapper, UserRepository userRepository) {
-		this.pomodoroSessionRepository = pomodoroSessionRepository;
-		this.pomodoroSessionMapper = pomodoroSessionMapper;
-		this.userRepository = userRepository;
-	}
+  public PomodoroSessionService(
+      PomodoroSessionRepository pomodoroSessionRepository,
+      PomodoroSessionMapper pomodoroSessionMapper,
+      UserRepository userRepository) {
+    this.pomodoroSessionRepository = pomodoroSessionRepository;
+    this.pomodoroSessionMapper = pomodoroSessionMapper;
+    this.userRepository = userRepository;
+  }
 
-	public List<PomodoroSessionResponseDto> getPomodoroSessionsByUser(String username) {
-		User user = userRepository.findByUsername(username).get();
+  public List<PomodoroSessionResponseDto> getPomodoroSessionsByUser(String username) {
+    if (username == null) {
+      throw new IllegalArgumentException("Username should not be null");
+    }
 
-		List<PomodoroSession> pomodoros = pomodoroSessionRepository.findAllByUser(user);
+    User user =
+        userRepository
+            .findByUsername(username)
+            .orElseThrow(
+                () ->
+                    new UsernameNotFoundException("Username not found with username " + username));
 
-		return pomodoroSessionMapper.pomodoroSessionsToPomodoroResponseDtos(pomodoros);
-	}
+    List<PomodoroSession> pomodoros = pomodoroSessionRepository.findAllByUser(user);
 
-	public PomodoroSessionResponseDto createPomodoroSession(User user, PomodoroSessionDto dto) {
-		// User user = userRepository.findByUsername(username).get();
-		PomodoroSession pomodoro = pomodoroSessionMapper.pomodoroSessionDtoToPomodoroSession(user, dto);
-		PomodoroSession savedPomodoro = pomodoroSessionRepository.save(pomodoro);
+    return pomodoroSessionMapper.pomodoroSessionsToPomodoroResponseDtos(pomodoros);
+  }
 
-		return pomodoroSessionMapper.pomodoroSessionToPomodoroResponseDto(savedPomodoro);
-	}
+  public PomodoroSessionResponseDto createPomodoroSession(User user, PomodoroSessionDto dto) {
+    if (user == null || dto == null) {
+      throw new IllegalArgumentException("User or pomodoro session dto should not be null");
+    }
 
-	public void updatePomodoroSession(Long pomodoroId, String sessionType) {
-		PomodoroSession pomodoro = pomodoroSessionRepository.findById(pomodoroId).orElseThrow(
-				() -> new EntityNotFoundException("Pomodoro not found with id " + pomodoroId));
+    PomodoroSession pomodoro = pomodoroSessionMapper.pomodoroSessionDtoToPomodoroSession(user, dto);
+    PomodoroSession savedPomodoro = pomodoroSessionRepository.save(pomodoro);
 
-		if ("task".equalsIgnoreCase(sessionType)) {
-			pomodoro.setTaskDuration(pomodoro.getTaskDuration() + 60);
-		} else if ("break".equalsIgnoreCase(sessionType)) {
-			pomodoro.setBreakDuration(pomodoro.getBreakDuration() + 60);
-		} else {
-			throw new IllegalArgumentException("Invalid session type: " + sessionType);
-		}
+    return pomodoroSessionMapper.pomodoroSessionToPomodoroResponseDto(savedPomodoro);
+  }
 
-		pomodoroSessionRepository.save(pomodoro);
-	}
+  public void updatePomodoroSession(Long pomodoroId, String sessionType) {
+    if (pomodoroId == null || sessionType == null) {
+      throw new IllegalArgumentException("Pomdoro id and session type should not be null");
+    }
 
-	public PomodoroSessionTodayOverviewDto getTodayTotals(User user) {
-		Tuple todayTotalsTuple = pomodoroSessionRepository.findTodayTotal(user.getId());
+    PomodoroSession pomodoro =
+        pomodoroSessionRepository
+            .findById(pomodoroId)
+            .orElseThrow(
+                () -> new EntityNotFoundException("Pomodoro not found with id " + pomodoroId));
 
-		PomodoroSessionTodayOverviewDto dto = new PomodoroSessionTodayOverviewDto(
-				todayTotalsTuple.get(0, Long.class),
-				todayTotalsTuple.get(1, Long.class),
-				todayTotalsTuple.get(2, Long.class),
-				todayTotalsTuple.get(3, Long.class));
+    if ("task".equalsIgnoreCase(sessionType)) {
+      pomodoro.setTaskDuration(pomodoro.getTaskDuration() + 60);
+    } else if ("break".equalsIgnoreCase(sessionType)) {
+      pomodoro.setBreakDuration(pomodoro.getBreakDuration() + 60);
+    } else {
+      throw new IllegalArgumentException("Invalid session type " + sessionType);
+    }
 
-		return dto;
-	}
+    pomodoroSessionRepository.save(pomodoro);
+  }
 
-	public PomodoroSessionAllTimeDto getAllTimeTotals(User user) {
-		Tuple allTimeTotalsTuple = pomodoroSessionRepository.findAllTimeTotals(user.getId());
+  public PomodoroSessionTodayOverviewDto getTodayTotals(User user) {
+    Tuple todayTotalsTuple = pomodoroSessionRepository.findTodayTotal(user.getId());
 
-		PomodoroSessionAllTimeDto dto = new PomodoroSessionAllTimeDto(
-				allTimeTotalsTuple.get(0, Long.class),
-				allTimeTotalsTuple.get(1, Long.class),
-				allTimeTotalsTuple.get(2, Long.class),
-				allTimeTotalsTuple.get(3, Long.class));
+    PomodoroSessionTodayOverviewDto dto =
+        new PomodoroSessionTodayOverviewDto(
+            todayTotalsTuple.get(0, Long.class),
+            todayTotalsTuple.get(1, Long.class),
+            todayTotalsTuple.get(2, Long.class),
+            todayTotalsTuple.get(3, Long.class));
 
-		return dto;
-	}
+    return dto;
+  }
 
-	public List<PomodoroSessionWeeklyDto> getCurrentWeeklyAnalytics(User user) {
-		List<Tuple> currentWeekTuple = pomodoroSessionRepository.findCurrentWeekAnalytics(user.getId());
+  public PomodoroSessionAllTimeDto getAllTimeTotals(User user) {
+    Tuple allTimeTotalsTuple = pomodoroSessionRepository.findAllTimeTotals(user.getId());
 
-		List<PomodoroSessionWeeklyDto> dto = currentWeekTuple.stream()
-				.map(a -> new PomodoroSessionWeeklyDto(
-						a.get(0, String.class),
-						a.get(1, Long.class),
-						a.get(2, Long.class),
-						a.get(3, Long.class)))
-				.collect(Collectors.toList());
-		return dto;
+    PomodoroSessionAllTimeDto dto =
+        new PomodoroSessionAllTimeDto(
+            allTimeTotalsTuple.get(0, Long.class),
+            allTimeTotalsTuple.get(1, Long.class),
+            allTimeTotalsTuple.get(2, Long.class),
+            allTimeTotalsTuple.get(3, Long.class));
 
-	}
+    return dto;
+  }
 
+  public List<PomodoroSessionWeeklyDto> getCurrentWeeklyAnalytics(User user) {
+    List<Tuple> currentWeekTuple = pomodoroSessionRepository.findCurrentWeekAnalytics(user.getId());
+
+    List<PomodoroSessionWeeklyDto> dto =
+        currentWeekTuple.stream()
+            .map(
+                a ->
+                    new PomodoroSessionWeeklyDto(
+                        a.get(0, String.class),
+                        a.get(1, Long.class),
+                        a.get(2, Long.class),
+                        a.get(3, Long.class)))
+            .collect(Collectors.toList());
+    return dto;
+  }
 }

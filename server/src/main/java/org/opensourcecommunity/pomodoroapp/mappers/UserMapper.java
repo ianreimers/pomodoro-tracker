@@ -1,4 +1,3 @@
-
 package org.opensourcecommunity.pomodoroapp.mappers;
 
 import org.opensourcecommunity.pomodoroapp.dtos.UserDto;
@@ -9,28 +8,33 @@ import org.springframework.stereotype.Service;
 @Service
 public class UserMapper {
 
-	public UserResponseDto userToUserResponseDto(User user) {
-		return new UserResponseDto(
-				user.getId(),
-				user.getUsername(),
-				user.getEmail(),
-				user.getUserSettings());
-	}
+  public UserResponseDto userToUserResponseDto(User user) {
+    if (user == null) {
+      throw new NullPointerException("The user should not be null");
+    }
 
-	public UserDto userToUserDto(User user) {
-		return new UserDto(
-				user.getUsername(),
-				user.getEmail(),
-				user.getPassword());
-	}
+    return new UserResponseDto(
+        user.getId(), user.getUsername(), user.getEmail(), user.getUserSettings());
+  }
 
-	public User userDtoToUser(UserDto dto) {
-		User user = new User();
-		user.setUsername(dto.username());
-		user.setEmail(dto.email());
-		user.setPassword(dto.password());
+  public UserDto userToUserDto(User user) {
+    if (user == null) {
+      throw new NullPointerException("The user should not be null");
+    }
 
-		return user;
-	}
+    return new UserDto(user.getUsername(), user.getEmail(), user.getPassword());
+  }
 
+  public User userDtoToUser(UserDto dto) {
+    if (dto == null) {
+      throw new NullPointerException("The user should not be null");
+    }
+
+    User user = new User();
+    user.setUsername(dto.username());
+    user.setEmail(dto.email());
+    user.setPassword(dto.password());
+
+    return user;
+  }
 }

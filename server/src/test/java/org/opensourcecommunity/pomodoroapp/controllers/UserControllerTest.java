@@ -61,12 +61,11 @@ public class UserControllerTest {
         .andExpect(jsonPath("$[0].userSettings").value(userResponseDto.userSettings()))
         .andDo(print());
 
-    // Verify that the service method was called once
     verify(userService).getAllUsers();
   }
 
   @Test
-  void getUserById_WithValidId_ReturnUserResponseDto() throws Exception {
+  void getUserById_WhenIdIsValid_ReturnUserResponseDto() throws Exception {
     User user = TestDataFactory.createUser();
     UserResponseDto userResponseDto = TestDataFactory.createUserResponseDto(user, null);
 
@@ -82,12 +81,11 @@ public class UserControllerTest {
         .andExpect(jsonPath("userSettings").value(userResponseDto.userSettings()))
         .andDo(print());
 
-    // Verify that the service method was called once
     verify(userService).getUserResponseDtoById(user.getId());
   }
 
   @Test
-  void getUserById_WithInvalidId_ThrowUserNotFoundException() throws Exception {
+  void getUserById_WhenIdIsInvalid_ThrowUserNotFoundException() throws Exception {
     Long invalidUserId = 1L;
 
     when(userService.getUserResponseDtoById(invalidUserId))
@@ -104,9 +102,10 @@ public class UserControllerTest {
   }
 
   @Test
-  void createUser_WithValidUserDto_ReturnUserResponseDto() throws Exception {
+  void createUser_WhenUserDtoIsValid_ReturnUserResponseDto() throws Exception {
     User user = TestDataFactory.createUser();
     UserSettings userSettings = TestDataFactory.createUserSettings(1L, user);
+    user.setUserSettings(userSettings);
     UserDto userDto = TestDataFactory.createUserDto(user);
     UserResponseDto userResponseDto = TestDataFactory.createUserResponseDto(user);
 
@@ -138,7 +137,7 @@ public class UserControllerTest {
   }
 
   @Test
-  void deleteUser_WithValidId_ReturnNoContent() throws Exception {
+  void deleteUser_WhenIdIsValid_ReturnNoContent() throws Exception {
     Long validId = 1L;
 
     doNothing().when(userService).deleteUserById(validId);

@@ -46,8 +46,8 @@ public class TestDataFactory {
   }
 
   public static UserResponseDto createUserResponseDto(User user) {
-    UserSettings userSettings = createUserSettings(1L, user);
-    return new UserResponseDto(1L, "user", "user@example.com", userSettings);
+    return new UserResponseDto(
+        user.getId(), user.getUsername(), user.getEmail(), user.getUserSettings());
   }
 
   public static UserResponseDto createUserResponseDto(User user, UserSettings userSettings) {

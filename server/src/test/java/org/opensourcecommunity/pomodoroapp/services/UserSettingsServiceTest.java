@@ -6,17 +6,19 @@ import static org.mockito.Mockito.*;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.opensourcecommunity.pomodoroapp.dtos.UserSettingsDto;
 import org.opensourcecommunity.pomodoroapp.exceptions.UserSettingsNotFoundException;
 import org.opensourcecommunity.pomodoroapp.mappers.UserSettingsMapper;
-import org.opensourcecommunity.pomodoroapp.models.Role;
 import org.opensourcecommunity.pomodoroapp.models.User;
 import org.opensourcecommunity.pomodoroapp.models.UserSettings;
 import org.opensourcecommunity.pomodoroapp.repositories.UserSettingsRepository;
+import org.opensourcecommunity.pomodoroapp.util.TestDataFactory;
 
+@ExtendWith(MockitoExtension.class)
 public class UserSettingsServiceTest {
 
   @Mock private UserSettingsRepository userSettingsRepository;
@@ -24,40 +26,20 @@ public class UserSettingsServiceTest {
 
   @InjectMocks private UserSettingsService userSettingsService;
 
+  private Long userSettingsId = 1L;
+  private Long userId = 1L;
+  private User user;
+  private UserSettings userSettings;
+
   @BeforeEach
   void setUp() {
-    MockitoAnnotations.openMocks(this);
-  }
-
-  private User createUser(Long userId) {
-    return User.builder()
-        .id(userId)
-        .username("user")
-        .email("user@example.com")
-        .password("password")
-        .role(Role.USER)
-        .build();
-  }
-
-  private UserSettings createUserSettings(Long userSettingsId, User user) {
-    return UserSettings.builder()
-        .id(userSettingsId)
-        .taskSeconds(1500)
-        .shortBreakSeconds(600)
-        .longBreakSeconds(1800)
-        .pomodoroInterval(4)
-        .sound("bells")
-        .user(user)
-        .build();
+    user = TestDataFactory.createUser(userId);
+    userSettings = TestDataFactory.createUserSettings(userSettingsId, user);
   }
 
   @Test
   void getUserSettingsById_WithValidId_ReturnUserSettings() {
     // Arrange
-    Long userSettingsId = 1L;
-    Long userId = 1L;
-    User user = createUser(userId);
-    UserSettings userSettings = createUserSettings(userSettingsId, user);
 
     when(userSettingsRepository.findById(userSettingsId)).thenReturn(Optional.of(userSettings));
 
@@ -96,10 +78,6 @@ public class UserSettingsServiceTest {
   @Test
   void getUserSettingsByUser_WithValidUser_ReturnUserSettingsDto() {
     // Arrange
-    Long userSettingsId = 1L;
-    Long userId = 5L;
-    User user = createUser(userId);
-    UserSettings userSettings = createUserSettings(userSettingsId, user);
     user.setUserSettings(userSettings);
     UserSettingsDto dto =
         new UserSettingsDto(
@@ -135,8 +113,6 @@ public class UserSettingsServiceTest {
 
   @Test
   void getUserSettingsByUser_WithNullUserSettings_ThrowsUserSettingsNotFoundException() {
-    User user = createUser(1L);
-
     UserSettingsNotFoundException exception =
         assertThrows(
             UserSettingsNotFoundException.class,
@@ -148,12 +124,6 @@ public class UserSettingsServiceTest {
 
   @Test
   void createUserSettings_WithValidUser_ReturnUserSettings() {
-    // Arrange
-    Long userId = 1L;
-    Long userSettingsId = 5L;
-    User user = createUser(userId);
-    UserSettings userSettings = createUserSettings(userSettingsId, user);
-
     when(userSettingsRepository.save(any(UserSettings.class)))
         .thenAnswer(
             i -> {
@@ -167,7 +137,7 @@ public class UserSettingsServiceTest {
 
     // Assert
     assertNotNull(responseUserSettings);
-    assertEquals(5L, responseUserSettings.getId());
+    assertEquals(1L, responseUserSettings.getId());
     assertEquals(1500, responseUserSettings.getTaskSeconds());
     assertEquals(600, responseUserSettings.getShortBreakSeconds());
     assertEquals(1800, responseUserSettings.getLongBreakSeconds());
@@ -188,10 +158,6 @@ public class UserSettingsServiceTest {
   @Test
   void userSettingsToUserSettingsDto_WithValidUserSettings_ReturnUserSettingsDto() {
     // Arrange
-    Long userId = 1L;
-    Long userSettingsId = 5L;
-    User user = createUser(userId);
-    UserSettings userSettings = createUserSettings(userSettingsId, user);
     UserSettingsDto dto =
         new UserSettingsDto(
             userSettings.getTaskSeconds(),
@@ -227,10 +193,6 @@ public class UserSettingsServiceTest {
 
   @Test
   void updateUserSettings_WithValidUserAndUserSettingsDto_ReturnUserSettingsDto() {
-    Long userId = 1L;
-    Long userSettingsId = 5L;
-    User user = createUser(userId);
-    UserSettings userSettings = createUserSettings(userSettingsId, user);
     user.setUserSettings(userSettings);
     UserSettingsDto dto =
         new UserSettingsDto(
@@ -257,8 +219,6 @@ public class UserSettingsServiceTest {
 
   @Test
   void updateUserSettings_WithNullUserSettings_ThrowsUserSettingsNotFoundException() {
-    User user = createUser(1L);
-    UserSettings userSettings = createUserSettings(5L, user);
     UserSettingsDto dto =
         new UserSettingsDto(
             userSettings.getTaskSeconds(),
@@ -277,8 +237,6 @@ public class UserSettingsServiceTest {
 
   @Test
   void updateUserSettings_WithNullUserOrNullUserSettingsDto_ThrowsIllegalArgumentException() {
-    User user = createUser(1L);
-
     IllegalArgumentException exception =
         assertThrows(
             IllegalArgumentException.class,

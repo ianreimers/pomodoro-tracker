@@ -14,7 +14,9 @@ import org.opensourcecommunity.pomodoroapp.config.JwtService;
 import org.opensourcecommunity.pomodoroapp.dtos.AuthenticationRequestDto;
 import org.opensourcecommunity.pomodoroapp.dtos.AuthenticationResponseDto;
 import org.opensourcecommunity.pomodoroapp.dtos.RegisterRequestDto;
+import org.opensourcecommunity.pomodoroapp.exceptions.EmailExistsException;
 import org.opensourcecommunity.pomodoroapp.exceptions.InvalidCredentialsException;
+import org.opensourcecommunity.pomodoroapp.exceptions.UsernameExistsException;
 import org.opensourcecommunity.pomodoroapp.models.User;
 import org.opensourcecommunity.pomodoroapp.models.UserSettings;
 import org.opensourcecommunity.pomodoroapp.repositories.UserRepository;
@@ -73,9 +75,9 @@ public class AuthenticationServiceTest {
 
     when(userRepository.existsByUsername(registerDto.getUsername())).thenReturn(true);
 
-    Exception e =
+    UsernameExistsException e =
         assertThrows(
-            IllegalArgumentException.class, () -> authenticationService.register(registerDto));
+            UsernameExistsException.class, () -> authenticationService.register(registerDto));
 
     assertEquals("Username already exists", e.getMessage());
     verify(userRepository, never()).save(any(User.class));
@@ -87,9 +89,8 @@ public class AuthenticationServiceTest {
 
     when(userRepository.existsByEmail(registerDto.getEmail())).thenReturn(true);
 
-    Exception e =
-        assertThrows(
-            IllegalArgumentException.class, () -> authenticationService.register(registerDto));
+    EmailExistsException e =
+        assertThrows(EmailExistsException.class, () -> authenticationService.register(registerDto));
 
     assertEquals("Email already exists", e.getMessage());
     verify(userRepository, never()).save(any(User.class));

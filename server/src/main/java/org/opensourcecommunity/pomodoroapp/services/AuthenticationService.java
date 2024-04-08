@@ -5,7 +5,9 @@ import org.opensourcecommunity.pomodoroapp.config.JwtService;
 import org.opensourcecommunity.pomodoroapp.dtos.AuthenticationRequestDto;
 import org.opensourcecommunity.pomodoroapp.dtos.AuthenticationResponseDto;
 import org.opensourcecommunity.pomodoroapp.dtos.RegisterRequestDto;
+import org.opensourcecommunity.pomodoroapp.exceptions.EmailExistsException;
 import org.opensourcecommunity.pomodoroapp.exceptions.InvalidCredentialsException;
+import org.opensourcecommunity.pomodoroapp.exceptions.UsernameExistsException;
 import org.opensourcecommunity.pomodoroapp.models.User;
 import org.opensourcecommunity.pomodoroapp.repositories.UserRepository;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -27,11 +29,11 @@ public class AuthenticationService {
 
   public AuthenticationResponseDto register(RegisterRequestDto request) {
     if (userRepository.existsByUsername(request.getUsername())) {
-      throw new IllegalArgumentException("Username already exists");
+      throw new UsernameExistsException("Username already exists");
     }
 
     if (userRepository.existsByEmail(request.getEmail())) {
-      throw new IllegalArgumentException("Email already exists");
+      throw new EmailExistsException("Email already exists");
     }
 
     User user =

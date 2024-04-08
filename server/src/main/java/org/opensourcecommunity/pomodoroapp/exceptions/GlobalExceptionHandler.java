@@ -56,6 +56,18 @@ public class GlobalExceptionHandler {
     return buildResponse(exp.getMessage(), HttpStatus.NOT_FOUND, request);
   }
 
+  @ExceptionHandler(EmailExistsException.class)
+  public ResponseEntity<ErrorResponse> handleEmailExistsException(
+      EmailExistsException exp, WebRequest request) {
+    return buildResponse(exp.getMessage(), HttpStatus.CONFLICT, request);
+  }
+
+  @ExceptionHandler(UsernameExistsException.class)
+  public ResponseEntity<ErrorResponse> handleEmailExistsException(
+      UsernameExistsException exp, WebRequest request) {
+    return buildResponse(exp.getMessage(), HttpStatus.CONFLICT, request);
+  }
+
   @ExceptionHandler(ForbiddenException.class)
   public ResponseEntity<?> handleForbiddenException(ForbiddenException exp, WebRequest request) {
     return buildResponse(exp.getMessage(), HttpStatus.FORBIDDEN, request);

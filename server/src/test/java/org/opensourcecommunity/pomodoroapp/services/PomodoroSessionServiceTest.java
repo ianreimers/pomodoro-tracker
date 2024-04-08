@@ -21,7 +21,6 @@ import org.opensourcecommunity.pomodoroapp.models.User;
 import org.opensourcecommunity.pomodoroapp.repositories.PomodoroSessionRepository;
 import org.opensourcecommunity.pomodoroapp.repositories.UserRepository;
 import org.opensourcecommunity.pomodoroapp.util.TestDataFactory;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
 public class PomodoroSessionServiceTest {
@@ -54,19 +53,17 @@ public class PomodoroSessionServiceTest {
     List<PomodoroSessionResponseDto> pomodoroSessionResponseDtos =
         Arrays.asList(pomodoroSessionResponseDto);
 
-    when(userRepository.findByUsername(user.getUsername())).thenReturn(Optional.of(user));
     when(pomodoroSessionRepository.findAllByUser(user)).thenReturn(pomodoros);
     when(pomodoroSessionMapper.pomodoroSessionsToPomodoroResponseDtos(pomodoros))
         .thenReturn(pomodoroSessionResponseDtos);
 
     // Act
     List<PomodoroSessionResponseDto> responsePomodoros =
-        pomodoroSessionService.getPomodoroSessionsByUser(user.getUsername());
+        pomodoroSessionService.getPomodoroSessionsByUser(user);
 
     // Assert
     assertNotNull(responsePomodoros);
     assertEquals(1, responsePomodoros.size());
-    verify(userRepository).findByUsername(user.getUsername());
     verify(pomodoroSessionRepository).findAllByUser(user);
     verify(pomodoroSessionMapper).pomodoroSessionsToPomodoroResponseDtos(pomodoros);
   }
@@ -78,18 +75,18 @@ public class PomodoroSessionServiceTest {
             IllegalArgumentException.class,
             () -> pomodoroSessionService.getPomodoroSessionsByUser(null));
 
-    assertEquals("Username should not be null", e.getMessage());
+    assertEquals("User should not be null", e.getMessage());
   }
 
-  @Test
-  void getPomodoroSessionByUser_WithInvalidUsername_ThrowsUsernameNotFoundException() {
-    UsernameNotFoundException e =
-        assertThrows(
-            UsernameNotFoundException.class,
-            () -> pomodoroSessionService.getPomodoroSessionsByUser("user"));
-
-    assertEquals("Username not found with username user", e.getMessage());
-  }
+  // @Test
+  // void getPomodoroSessionByUser_WithInvalidUsername_ThrowsUsernameNotFoundException() {
+  //   UsernameNotFoundException e =
+  //       assertThrows(
+  //           UsernameNotFoundException.class,
+  //           () -> pomodoroSessionService.getPomodoroSessionsByUser("user"));
+  //
+  //   assertEquals("Username not found with username user", e.getMessage());
+  // }
 
   @Test
   void createPomodoroSession_WithValidUserAndPomodoroSessionDto_ReturnPomodoroSessionResponseDto() {

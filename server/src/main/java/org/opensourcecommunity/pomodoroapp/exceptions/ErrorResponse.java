@@ -1,20 +1,27 @@
 package org.opensourcecommunity.pomodoroapp.exceptions;
 
-import java.util.List;
+import java.time.LocalDateTime;
 
 public class ErrorResponse {
-	private List<String> errors;
+  private LocalDateTime timestamp;
+  private String message;
+  private String details;
 
-	public ErrorResponse(List<String> errors) {
-		this.errors = errors;
-	}
+  public ErrorResponse(String message, String details) {
+    this.timestamp = LocalDateTime.now();
+    this.message = message;
+    this.details = details;
+  }
 
-	public List<String> getErrors() {
-		return errors;
-	}
+  public LocalDateTime getTimestamp() {
+    return timestamp;
+  }
 
-	public void setErrors(List<String> errors) {
-		this.errors = errors;
-	}
+  public String getMessage() {
+    return message;
+  }
 
+  public String getDetails() {
+    return details;
+  }
 }

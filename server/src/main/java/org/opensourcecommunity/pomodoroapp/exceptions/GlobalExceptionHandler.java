@@ -1,61 +1,63 @@
 package org.opensourcecommunity.pomodoroapp.exceptions;
 
-import java.util.Arrays;
-import java.util.HashMap;
+import java.util.stream.Collectors;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.context.request.WebRequest;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-  @ExceptionHandler(MethodArgumentNotValidException.class)
-  public ResponseEntity<?> handleMethodArgumentNotValidException(
-      MethodArgumentNotValidException exp) {
-    var errors = new HashMap<String, String>();
-    exp.getBindingResult()
-        .getAllErrors()
-        .forEach(
-            error -> {
-              var fieldName = ((FieldError) error).getField();
-              var errorMessage = error.getDefaultMessage();
-              errors.put(fieldName, errorMessage);
-            });
+  private ResponseEntity<ErrorResponse> buildResponse(
+      String message, HttpStatus status, WebRequest request) {
+    ErrorResponse errorResponse = new ErrorResponse(message, request.getDescription(false));
+    return new ResponseEntity<>(errorResponse, status);
+  }
 
-    return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
+  @ExceptionHandler(MethodArgumentNotValidException.class)
+  public ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException(
+      MethodArgumentNotValidException exp, WebRequest request) {
+    String errors =
+        exp.getBindingResult().getFieldErrors().stream()
+            .map(error -> error.getField() + ": " + error.getDefaultMessage())
+            .collect(Collectors.joining("; "));
+
+    if (errors.isEmpty()) {
+      errors = "Validation error";
+    }
+
+    return buildResponse(errors, HttpStatus.BAD_REQUEST, request);
   }
 
   @ExceptionHandler(InvalidCredentialsException.class)
-  public ResponseEntity<?> handleInvalidCredentialsException(InvalidCredentialsException exp) {
-    ErrorResponse errorResponse = new ErrorResponse(Arrays.asList(exp.getMessage()));
-    return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
+  public ResponseEntity<ErrorResponse> handleInvalidCredentialsException(
+      InvalidCredentialsException exp, WebRequest request) {
+    return buildResponse(exp.getMessage(), HttpStatus.NOT_FOUND, request);
   }
 
   @ExceptionHandler(UserNotFoundException.class)
-  public ResponseEntity<?> handleUserNotFoundException(UserNotFoundException exp) {
-    ErrorResponse errorResponse = new ErrorResponse(Arrays.asList(exp.getMessage()));
-    return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+  public ResponseEntity<ErrorResponse> handleUserNotFoundException(
+      UserNotFoundException exp, WebRequest request) {
+    return buildResponse(exp.getMessage(), HttpStatus.NOT_FOUND, request);
   }
 
   @ExceptionHandler(UserSettingsNotFoundException.class)
-  public ResponseEntity<?> handleUserSettingsNotFoundException(UserSettingsNotFoundException exp) {
-    ErrorResponse errorResponse = new ErrorResponse(Arrays.asList(exp.getMessage()));
-    return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+  public ResponseEntity<ErrorResponse> handleUserSettingsNotFoundException(
+      UserSettingsNotFoundException exp, WebRequest request) {
+    return buildResponse(exp.getMessage(), HttpStatus.NOT_FOUND, request);
   }
 
   @ExceptionHandler(PomodoroSessionNotFoundException.class)
-  public ResponseEntity<?> handlePomodoroSessionNotFoundException(
-      PomodoroSessionNotFoundException exp) {
-    ErrorResponse errorResponse = new ErrorResponse(Arrays.asList(exp.getMessage()));
-    return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+  public ResponseEntity<ErrorResponse> handlePomodoroSessionNotFoundException(
+      PomodoroSessionNotFoundException exp, WebRequest request) {
+    return buildResponse(exp.getMessage(), HttpStatus.NOT_FOUND, request);
   }
 
   @ExceptionHandler(ForbiddenException.class)
-  public ResponseEntity<?> handleForbiddenException(ForbiddenException exp) {
-    ErrorResponse errorResponse = new ErrorResponse(Arrays.asList(exp.getMessage()));
-    return new ResponseEntity<>(errorResponse, HttpStatus.FORBIDDEN);
+  public ResponseEntity<?> handleForbiddenException(ForbiddenException exp, WebRequest request) {
+    return buildResponse(exp.getMessage(), HttpStatus.FORBIDDEN, request);
   }
 }

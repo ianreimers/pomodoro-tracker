@@ -14,7 +14,6 @@ import org.opensourcecommunity.pomodoroapp.models.PomodoroSession;
 import org.opensourcecommunity.pomodoroapp.models.User;
 import org.opensourcecommunity.pomodoroapp.repositories.PomodoroSessionRepository;
 import org.opensourcecommunity.pomodoroapp.repositories.UserRepository;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -32,17 +31,10 @@ public class PomodoroSessionService {
     this.userRepository = userRepository;
   }
 
-  public List<PomodoroSessionResponseDto> getPomodoroSessionsByUser(String username) {
-    if (username == null) {
-      throw new IllegalArgumentException("Username should not be null");
+  public List<PomodoroSessionResponseDto> getPomodoroSessionsByUser(User user) {
+    if (user == null) {
+      throw new IllegalArgumentException("User should not be null");
     }
-
-    User user =
-        userRepository
-            .findByUsername(username)
-            .orElseThrow(
-                () ->
-                    new UsernameNotFoundException("Username not found with username " + username));
 
     List<PomodoroSession> pomodoros = pomodoroSessionRepository.findAllByUser(user);
 

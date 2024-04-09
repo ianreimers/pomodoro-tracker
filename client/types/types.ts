@@ -1,4 +1,3 @@
-
 export interface Credentials {
   username: string;
   password: string;
@@ -17,20 +16,19 @@ export interface AuthState {
   user: User | null;
   token: string;
   isLoading: boolean;
-
 }
 
-export type SessionType = "task" | "short break" | "long break";
+export type SessionType = 'task' | 'short break' | 'long break';
 
 export interface PomodoroContextType {
   remainingSeconds: number;
   currSessionType: SessionType;
   isPlaying: boolean;
   totalPomodoros: number;
-  resetCycle: () => void,
+  resetCycle: () => void;
   togglePlaying: () => void;
   skipSession: () => void;
-};
+}
 
 export interface PomodoroReducerState {
   remainingSeconds: number;
@@ -39,7 +37,7 @@ export interface PomodoroReducerState {
   totalPomodoros: number;
   currSessionType: SessionType;
   currPomodoroId: string | number;
-  currBreakType: "SHORT" | "LONG"
+  currBreakType: 'SHORT' | 'LONG';
 }
 
 export interface PomodoroSession {
@@ -72,12 +70,13 @@ export interface UserSettings {
   longBreakSeconds: number;
   pomodoroInterval: number;
   sound: string;
+  soundVolume: number;
 }
 
 export interface AuthenticatedUser {
   token: string;
   username: string;
-  userSettings: UserSettings
+  userSettings: UserSettings;
 }
 
 export interface User {
@@ -99,7 +98,7 @@ export interface UserSettingsState {
   longBreakTimeUnits: TimeUnitNums;
   pomodoroInterval: number;
   sound: string;
-
+  soundVolume: number;
 }
 
 export type PomodoroTotalsAPIData = {
@@ -107,25 +106,25 @@ export type PomodoroTotalsAPIData = {
   totalTaskSeconds: number;
   totalPomodoros: number;
   totalSeconds: number;
-}
+};
 
 export interface PomodoroTotalUIData {
   totalTasks: {
-    title: String,
-    data: number
-  }
+    title: String;
+    data: number;
+  };
   totalTaskSeconds: {
-    title: String,
-    data: string
-  }
+    title: String;
+    data: string;
+  };
   totalPomodoros: {
-    title: String,
-    data: number
-  }
+    title: String;
+    data: number;
+  };
   totalSeconds: {
-    title: String,
-    data: string
-  }
+    title: String;
+    data: string;
+  };
 }
 
 export interface WeekAnalaytics {

@@ -1,15 +1,15 @@
-"use client"
-import axios, { AxiosError } from "axios";
-import { useAuthContext } from "@/contexts/auth/auth-context";
-import { useEffect, useState } from "react";
-import { useToast } from "@/components/ui/use-toast";
+'use client';
+import axios, { AxiosError } from 'axios';
+import { useAuthContext } from '@/contexts/auth/auth-context';
+import { useEffect, useState } from 'react';
+import { useToast } from '@/components/ui/use-toast';
 
 const axiosInstance = axios.create({
   baseURL: `${process.env.NEXT_PUBLIC_API_BASE_URL}`,
   headers: {
-    "Content-Type": "application/json"
-  }
-})
+    'Content-Type': 'application/json',
+  },
+});
 
 function AxiosInterceptor({ children }: { children: React.ReactNode }) {
   const [isSet, setIsSet] = useState(false);
@@ -17,14 +17,14 @@ function AxiosInterceptor({ children }: { children: React.ReactNode }) {
   const { toast } = useToast();
 
   /*
-    *
-    * As of right now, the server only returns an array of error messages
-    * for the errors that are handled
-    * {
-    *   "errors": string[]
-    * }
-    *
-    */
+   *
+   * As of right now, the server only returns an array of error messages
+   * for the errors that are handled
+   * {
+   *   "errors": string[]
+   * }
+   *
+   */
 
   function handleAxiosError(error: AxiosError) {
     if (error.response) {
@@ -33,41 +33,48 @@ function AxiosInterceptor({ children }: { children: React.ReactNode }) {
           handleUnauthorizedError(error.response.data);
           return;
         case 409:
-          console.log(error.response.data.message);
           toast({
             description: error.response.data.message,
-            variant: "destructive"
-          })
-        return;
+            variant: 'destructive',
+          });
+          return;
         default:
-          console.error(`Unhandled error [${error.response.status}]:`, error.response.data);
+          console.error(
+            `Unhandled error [${error.response.status}]:`,
+            error.response.data
+          );
       }
-
     } else if (error.request) {
       // A request was made but no response was received
-      console.error("No response received:", error.request)
+      console.error('No response received:', error.request);
       toast({
-        description: "No response received from the server",
-        variant: "destructive"
-      })
+        description: 'No response received from the server',
+        variant: 'destructive',
+      });
     } else {
-      console.error("Something happened in setting up the request that triggered an error", error.message);
+      console.error(
+        'Something happened in setting up the request that triggered an error',
+        error.message
+      );
     }
   }
 
   function handleUnauthorizedError(data: any) {
     // Check if the error is due to invalid credentials or if its a token issue
-    if (data.errors && data.errors.some((msg: string) => msg === "Invalid credentials")) {
+    if (
+      data.errors &&
+      data.errors.some((msg: string) => msg === 'Invalid credentials')
+    ) {
       toast({
-        description: "Invalid credentials",
-        variant: "destructive"
+        description: 'Invalid credentials',
+        variant: 'destructive',
       });
     } else {
-      // Token issue 
+      // Token issue
       // We could implement refresh token logic here
       toast({
-        description: "Authentication required. Redirection to login..."
-      })
+        description: 'Authentication required. Redirection to login...',
+      });
       logout();
     }
   }
@@ -75,16 +82,15 @@ function AxiosInterceptor({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const requestInterceptorId = axiosInstance.interceptors.request.use(
       (request) => {
-        const token = localStorage.getItem("token");
+        const token = localStorage.getItem('token');
         if (token) {
           request.headers.setAuthorization(`Bearer ${token}`);
-
         }
 
         return request;
       },
       (error) => {
-        console.log("Axios request interceptor error: receive a request error");
+        console.log('Axios request interceptor error: receive a request error');
 
         return Promise.reject(error);
       }
@@ -100,7 +106,7 @@ function AxiosInterceptor({ children }: { children: React.ReactNode }) {
           handleAxiosError(error);
         } else {
           // This is a non-Axios error
-          console.error("An unexpected error occurred:", error);
+          console.error('An unexpected error occurred:', error);
         }
 
         return Promise.reject(error);
@@ -112,12 +118,10 @@ function AxiosInterceptor({ children }: { children: React.ReactNode }) {
     return () => {
       axiosInstance.interceptors.request.eject(requestInterceptorId);
       axiosInstance.interceptors.response.eject(responseInterceptorId);
-    }
-
+    };
   }, []);
 
   return isSet && children;
-
 }
 
 export default axiosInstance;

@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from 'zod'
 
 export const userSettingsFormSchema = z.object({
   taskTimeHours: z.coerce.number().int().max(23).min(0),
@@ -11,7 +11,8 @@ export const userSettingsFormSchema = z.object({
   longBreakMinutes: z.coerce.number().int().max(59).min(0),
   longBreakSeconds: z.coerce.number().int(),
   pomodoroInterval: z.coerce.number().int().min(1),
-  sound: z.coerce.string()
-});
+  sound: z.coerce.string(),
+  soundVolume: z.number(),
+})
 
-export type UserSettingsFormData = z.infer<typeof userSettingsFormSchema>;
+export type UserSettingsFormData = z.infer<typeof userSettingsFormSchema>

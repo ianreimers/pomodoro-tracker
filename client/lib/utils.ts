@@ -1,38 +1,43 @@
-import { type ClassValue, clsx } from "clsx"
-import { twMerge } from "tailwind-merge"
-import { TimeUnitNums, TimeUnitStrs, UserSettings, UserSettingsState, WeekAnalaytics } from "@/types/types"
-import { UserSettingsFormData } from "@/validation_schema/schemas"
-import { PomodoroTotalsAPIData, PomodoroTotalUIData } from "@/types/types"
-import humanizeDuration from "humanize-duration"
+import { type ClassValue, clsx } from 'clsx';
+import { twMerge } from 'tailwind-merge';
+import {
+  TimeUnitNums,
+  TimeUnitStrs,
+  UserSettings,
+  UserSettingsState,
+  WeekAnalaytics,
+} from '@/types/types';
+import { UserSettingsFormData } from '@/validation_schema/schemas';
+import { PomodoroTotalsAPIData, PomodoroTotalUIData } from '@/types/types';
+import humanizeDuration from 'humanize-duration';
 
 const shortEnglishHumanizer = humanizeDuration.humanizer({
-  language: "shortEn",
-  spacer: "",
+  language: 'shortEn',
+  spacer: '',
   languages: {
     shortEn: {
-      y: () => "y",
-      mo: () => "mo",
-      w: () => "w",
-      d: () => "d",
-      h: () => "h",
-      m: () => "m",
-      s: () => "s",
-      ms: () => "ms",
+      y: () => 'y',
+      mo: () => 'mo',
+      w: () => 'w',
+      d: () => 'd',
+      h: () => 'h',
+      m: () => 'm',
+      s: () => 's',
+      ms: () => 'ms',
     },
   },
-})
+});
 
 export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
+  return twMerge(clsx(inputs));
 }
 
 export function timeUnitsToSeconds({ hours, mins, secs }: TimeUnitNums) {
-  return secs + (mins * 60) + (hours * 60 * 60)
-
+  return secs + mins * 60 + hours * 60 * 60;
 }
 
 function secondsToMinutes(seconds: number) {
-  return Math.floor(seconds / 60)
+  return Math.floor(seconds / 60);
 }
 
 export function secondsToTime(seconds: number) {
@@ -40,40 +45,48 @@ export function secondsToTime(seconds: number) {
   const mins = Math.floor(seconds / 60) % 60;
   const hours = Math.floor(seconds / 60 / 60) % 24;
 
-  const secs_str = secs.toString().padStart(2, "0")
-  const mins_str = mins.toString().padStart(2, "0")
-  const hours_str = hours.toString().padStart(2, "0")
+  const secs_str = secs.toString().padStart(2, '0');
+  const mins_str = mins.toString().padStart(2, '0');
+  const hours_str = hours.toString().padStart(2, '0');
 
-  return `${hours_str}:${mins_str}:${secs_str}`
+  return `${hours_str}:${mins_str}:${secs_str}`;
 }
 
 export function title(words: string) {
-  const word_arr = words.split(" ");
+  const word_arr = words.split(' ');
 
   for (let i = 0; i < word_arr.length; ++i) {
     word_arr[i] = word_arr[i].charAt(0).toUpperCase() + word_arr[i].slice(1);
   }
 
-  return word_arr.join(" ");
+  return word_arr.join(' ');
 }
 
-export function secondsToTimeUnits(seconds: number, withPadding: false): TimeUnitNums;
-export function secondsToTimeUnits(seconds: number, withPadding: true): TimeUnitStrs;
-export function secondsToTimeUnits(seconds: number, withPadding: boolean): TimeUnitNums | TimeUnitStrs {
+export function secondsToTimeUnits(
+  seconds: number,
+  withPadding: false
+): TimeUnitNums;
+export function secondsToTimeUnits(
+  seconds: number,
+  withPadding: true
+): TimeUnitStrs;
+export function secondsToTimeUnits(
+  seconds: number,
+  withPadding: boolean
+): TimeUnitNums | TimeUnitStrs {
   const secs = seconds % 60;
   const mins = Math.floor(seconds / 60) % 60;
   const hours = Math.floor(seconds / 60 / 60) % 24;
 
   if (withPadding) {
-    const hours_str = hours.toString().padStart(2, "0");
-    const mins_str = mins.toString().padStart(2, "0");
-    const secs_str = secs.toString().padStart(2, "0");
+    const hours_str = hours.toString().padStart(2, '0');
+    const mins_str = mins.toString().padStart(2, '0');
+    const secs_str = secs.toString().padStart(2, '0');
     const obj: TimeUnitStrs = {
       hours: hours_str,
       mins: mins_str,
-      secs: secs_str
+      secs: secs_str,
     };
-
 
     return obj;
   }
@@ -81,7 +94,7 @@ export function secondsToTimeUnits(seconds: number, withPadding: boolean): TimeU
   const obj: TimeUnitNums = {
     hours,
     mins,
-    secs
+    secs,
   };
   return obj;
 }
@@ -95,28 +108,36 @@ export function mapSettingsToState(settings: UserSettings): UserSettingsState {
     shortBreakTimeUnits: secondsToTimeUnits(settings.shortBreakSeconds, false),
     longBreakTimeUnits: secondsToTimeUnits(settings.longBreakSeconds, false),
     pomodoroInterval: settings.pomodoroInterval,
-    sound: settings.sound
-  }
+    sound: settings.sound,
+    soundVolume: settings.soundVolume,
+  };
 }
 
-export function mapUserSettingsFormDataToRequest(settingsFormData: UserSettingsFormData): UserSettings {
+export function mapUserSettingsFormDataToRequest(
+  settingsFormData: UserSettingsFormData
+): UserSettings {
   const {
     taskSeconds,
     shortBreakSeconds,
     longBreakSeconds,
     pomodoroInterval,
-    sound } = mapUserSettingsFormDataToState(settingsFormData);
+    sound,
+    soundVolume,
+  } = mapUserSettingsFormDataToState(settingsFormData);
 
   return {
     taskSeconds,
     shortBreakSeconds,
     longBreakSeconds,
     pomodoroInterval,
-    sound
-  }
+    sound,
+    soundVolume,
+  };
 }
 
-export function mapUserSettingsFormDataToState(settingsFormData: UserSettingsFormData): UserSettingsState {
+export function mapUserSettingsFormDataToState(
+  settingsFormData: UserSettingsFormData
+): UserSettingsState {
   const {
     taskTimeHours,
     taskTimeMinutes,
@@ -128,19 +149,19 @@ export function mapUserSettingsFormDataToState(settingsFormData: UserSettingsFor
     longBreakMinutes,
     longBreakSeconds,
     pomodoroInterval,
-    sound
+    sound,
+    soundVolume,
   } = settingsFormData;
 
   const taskTimeUnits = {
     hours: taskTimeHours,
     mins: taskTimeMinutes,
-    secs: taskTimeSeconds || 0
+    secs: taskTimeSeconds || 0,
   };
   const shortBreakTimeUnits = {
     hours: shortBreakHours,
     mins: shortBreakMinutes,
     secs: shortBreakSeconds || 0,
-
   };
   const longBreakTimeUnits = {
     hours: longBreakHours,
@@ -156,34 +177,44 @@ export function mapUserSettingsFormDataToState(settingsFormData: UserSettingsFor
     shortBreakTimeUnits,
     longBreakTimeUnits,
     pomodoroInterval,
-    sound
-  }
+    sound,
+    soundVolume,
+  };
 }
 
-
-export function mapTotalDataToTodayUIData(data: PomodoroTotalsAPIData): PomodoroTotalUIData {
+export function mapTotalDataToTodayUIData(
+  data: PomodoroTotalsAPIData
+): PomodoroTotalUIData {
   return {
     totalTasks: {
-      title: "Tasks Completed",
-      data: data.totalTasks
+      title: 'Tasks Completed',
+      data: data.totalTasks,
     },
     totalTaskSeconds: {
-      title: "Total Task Time",
-      data: shortEnglishHumanizer(data.totalTaskSeconds * 1000)
+      title: 'Total Task Time',
+      data: shortEnglishHumanizer(data.totalTaskSeconds * 1000),
     },
     totalPomodoros: {
-      title: "Pomodoros Completed",
-      data: data.totalPomodoros
+      title: 'Pomodoros Completed',
+      data: data.totalPomodoros,
     },
     totalSeconds: {
-      title: "Total Time",
-      data: shortEnglishHumanizer(data.totalSeconds * 1000)
-    }
-  }
+      title: 'Total Time',
+      data: shortEnglishHumanizer(data.totalSeconds * 1000),
+    },
+  };
 }
 
 export function mapWeekAnalyticsToChartData(data: WeekAnalaytics[]) {
-  const daysOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+  const daysOfWeek = [
+    'Monday',
+    'Tuesday',
+    'Wednesday',
+    'Thursday',
+    'Friday',
+    'Saturday',
+    'Sunday',
+  ];
   const chartData = [];
 
   if (!data.length) {
@@ -192,8 +223,8 @@ export function mapWeekAnalyticsToChartData(data: WeekAnalaytics[]) {
         dayOfTheWeek: day,
         totalTaskMinutes: 0,
         totalShortBreakMinutes: 0,
-        totalLongBreakMinutes: 0
-      }
+        totalLongBreakMinutes: 0,
+      };
       chartData.push(dayObj);
     }
     return chartData;
@@ -201,16 +232,19 @@ export function mapWeekAnalyticsToChartData(data: WeekAnalaytics[]) {
   for (let i = 0; i < daysOfWeek.length; ++i) {
     const day = daysOfWeek[i];
 
-    const potentialObj = data.find(obj => obj.dayOfTheWeek.trim() === day);
+    const potentialObj = data.find((obj) => obj.dayOfTheWeek.trim() === day);
 
     if (potentialObj) {
       chartData.push({
         dayOfTheWeek: day,
         totalTaskMinutes: secondsToMinutes(potentialObj.totalTaskSeconds),
-        totalShortBreakMinutes: secondsToMinutes(potentialObj.totalShortBreakSeconds),
-        totalLongBreakMinutes: secondsToMinutes(potentialObj.totalLongBreakSeconds)
-
-      })
+        totalShortBreakMinutes: secondsToMinutes(
+          potentialObj.totalShortBreakSeconds
+        ),
+        totalLongBreakMinutes: secondsToMinutes(
+          potentialObj.totalLongBreakSeconds
+        ),
+      });
       continue;
     }
 
@@ -218,9 +252,8 @@ export function mapWeekAnalyticsToChartData(data: WeekAnalaytics[]) {
       dayOfTheWeek: day,
       totalTaskMinutes: 0,
       totalShortBreakMinutes: 0,
-      totalLongBreakMinutes: 0
+      totalLongBreakMinutes: 0,
     });
-
   }
   return chartData;
 }

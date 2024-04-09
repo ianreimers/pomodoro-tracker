@@ -8,12 +8,12 @@ import WeekChart from "@/components/week-chart";
 
 
 
-function DashboardPage() {
+function AnalyticsPage() {
 
   return (
     <PageWrapper>
       <div className="flex-1 flex-col space-y-4">
-        <h1 className="text-4xl font-bold">Dashboard</h1>
+        <h1 className="text-4xl font-bold">Analytics</h1>
         <h2 className="text-2xl font-bold">Today</h2>
         <TodayTotals />
         <h2 className="text-2xl font-bold">Week Totals</h2>
@@ -27,4 +27,4 @@ function DashboardPage() {
 
 }
 
-export default withAuth(DashboardPage);
+export default withAuth(AnalyticsPage);

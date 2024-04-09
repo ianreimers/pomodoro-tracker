@@ -23,8 +23,8 @@ const Navbar = () => {
 				</Link>
 				{isAuthenticated() ? (
 					<>
-						<Link href={"/dashboard"} className="text-muted-foreground transition-colors hover:text-foreground">
-							Dashboard
+						<Link href={"/analytics"} className="text-muted-foreground transition-colors hover:text-foreground">
+							Analytics
 						</Link>
 						<Button onClick={() => logout()}>Logout</Button>
 					</>
@@ -61,8 +61,8 @@ const Navbar = () => {
 						</Link>
 						{isAuthenticated() ? (
 							<>
-								<Link href={"/dashboard"} className="text-muted-foreground hover:text-foreground">
-									Dashboard
+								<Link href={"/analytics"} className="text-muted-foreground hover:text-foreground">
+									Analytics
 								</Link>
 								<Button onClick={() => logout()}>Logout</Button>
 							</>

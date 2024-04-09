@@ -84,6 +84,7 @@ public class UserSettingsService {
     userSettings.setLongBreakSeconds(dto.longBreakSeconds());
     userSettings.setPomodoroInterval(dto.pomodoroInterval());
     userSettings.setSound(dto.sound());
+    userSettings.setSoundVolume(dto.soundVolume());
     UserSettings updatedUserSettings = userSettingsRepository.save(userSettings);
 
     return userSettingsMapper.userSettingsToUserSettingsDto(updatedUserSettings);

@@ -8,25 +8,25 @@ import org.springframework.stereotype.Service;
 @Service
 public class UserSettingsMapper {
 
-	public UserSettingsDto userSettingsToUserSettingsDto(UserSettings userSettings) {
-		return new UserSettingsDto(
-				userSettings.getTaskSeconds(),
-				userSettings.getShortBreakSeconds(),
-				userSettings.getLongBreakSeconds(),
-				userSettings.getPomodoroInterval(),
-				userSettings.getSound());
-	}
+  public UserSettingsDto userSettingsToUserSettingsDto(UserSettings userSettings) {
+    return new UserSettingsDto(
+        userSettings.getTaskSeconds(),
+        userSettings.getShortBreakSeconds(),
+        userSettings.getLongBreakSeconds(),
+        userSettings.getPomodoroInterval(),
+        userSettings.getSound(),
+        userSettings.getSoundVolume());
+  }
 
-	public UserSettings userSettingsDtoToUserSettings(UserSettingsDto dto, User user) {
-		return UserSettings
-				.builder()
-				.taskSeconds(dto.taskSeconds())
-				.shortBreakSeconds(dto.shortBreakSeconds())
-				.longBreakSeconds(dto.longBreakSeconds())
-				.pomodoroInterval(dto.pomodoroInterval())
-				.sound(dto.sound())
-				.user(user)
-				.build();
-	}
-
+  public UserSettings userSettingsDtoToUserSettings(UserSettingsDto dto, User user) {
+    return UserSettings.builder()
+        .taskSeconds(dto.taskSeconds())
+        .shortBreakSeconds(dto.shortBreakSeconds())
+        .longBreakSeconds(dto.longBreakSeconds())
+        .pomodoroInterval(dto.pomodoroInterval())
+        .sound(dto.sound())
+        .soundVolume(dto.soundVolume())
+        .user(user)
+        .build();
+  }
 }

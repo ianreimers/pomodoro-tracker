@@ -54,6 +54,7 @@ public class UserSettingsServiceTest {
     assertEquals(userSettings.getLongBreakSeconds(), responseUserSettings.getLongBreakSeconds());
     assertEquals(userSettings.getPomodoroInterval(), responseUserSettings.getPomodoroInterval());
     assertEquals(userSettings.getSound(), responseUserSettings.getSound());
+    assertEquals(userSettings.getSoundVolume(), responseUserSettings.getSoundVolume());
     verify(userSettingsRepository, times(1)).findById(userSettingsId);
   }
 
@@ -85,7 +86,8 @@ public class UserSettingsServiceTest {
             userSettings.getShortBreakSeconds(),
             userSettings.getLongBreakSeconds(),
             userSettings.getPomodoroInterval(),
-            userSettings.getSound());
+            userSettings.getSound(),
+            userSettings.getSoundVolume());
 
     when(userSettingsMapper.userSettingsToUserSettingsDto(userSettings)).thenReturn(dto);
 
@@ -99,6 +101,7 @@ public class UserSettingsServiceTest {
     assertEquals(userSettings.getLongBreakSeconds(), responseUserSettings.longBreakSeconds());
     assertEquals(userSettings.getPomodoroInterval(), responseUserSettings.pomodoroInterval());
     assertEquals(userSettings.getSound(), responseUserSettings.sound());
+    assertEquals(userSettings.getSoundVolume(), responseUserSettings.soundVolume());
     verify(userSettingsMapper, times(1)).userSettingsToUserSettingsDto(userSettings);
   }
 
@@ -143,6 +146,7 @@ public class UserSettingsServiceTest {
     assertEquals(1800, responseUserSettings.getLongBreakSeconds());
     assertEquals(4, responseUserSettings.getPomodoroInterval());
     assertEquals("bells", responseUserSettings.getSound());
+    assertEquals(100, responseUserSettings.getSoundVolume());
     verify(userSettingsRepository, times(1)).save(userSettings);
   }
 
@@ -164,7 +168,8 @@ public class UserSettingsServiceTest {
             userSettings.getShortBreakSeconds(),
             userSettings.getLongBreakSeconds(),
             userSettings.getPomodoroInterval(),
-            userSettings.getSound());
+            userSettings.getSound(),
+            userSettings.getSoundVolume());
 
     when(userSettingsMapper.userSettingsToUserSettingsDto(userSettings)).thenReturn(dto);
 
@@ -178,6 +183,7 @@ public class UserSettingsServiceTest {
     assertEquals(userSettings.getLongBreakSeconds(), responseDto.longBreakSeconds());
     assertEquals(userSettings.getPomodoroInterval(), responseDto.pomodoroInterval());
     assertEquals(userSettings.getSound(), responseDto.sound());
+    assertEquals(userSettings.getSoundVolume(), responseDto.soundVolume());
     verify(userSettingsMapper, times(1)).userSettingsToUserSettingsDto(userSettings);
   }
 
@@ -200,7 +206,8 @@ public class UserSettingsServiceTest {
             userSettings.getShortBreakSeconds(),
             userSettings.getLongBreakSeconds(),
             userSettings.getPomodoroInterval(),
-            userSettings.getSound());
+            userSettings.getSound(),
+            userSettings.getSoundVolume());
 
     when(userSettingsRepository.findByUser(user)).thenReturn(Optional.of(userSettings));
     when(userSettingsRepository.save(userSettings)).thenReturn(userSettings);
@@ -214,6 +221,7 @@ public class UserSettingsServiceTest {
     assertEquals(userSettings.getLongBreakSeconds(), responseDto.longBreakSeconds());
     assertEquals(userSettings.getPomodoroInterval(), responseDto.pomodoroInterval());
     assertEquals(userSettings.getSound(), responseDto.sound());
+    assertEquals(userSettings.getSoundVolume(), responseDto.soundVolume());
     verify(userSettingsMapper, times(1)).userSettingsToUserSettingsDto(userSettings);
   }
 
@@ -225,7 +233,8 @@ public class UserSettingsServiceTest {
             userSettings.getShortBreakSeconds(),
             userSettings.getLongBreakSeconds(),
             userSettings.getPomodoroInterval(),
-            userSettings.getSound());
+            userSettings.getSound(),
+            userSettings.getSoundVolume());
     UserSettingsNotFoundException exception =
         assertThrows(
             UserSettingsNotFoundException.class,

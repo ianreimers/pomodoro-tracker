@@ -62,6 +62,7 @@ public class TestDataFactory {
         .longBreakSeconds(1800)
         .pomodoroInterval(4)
         .sound("bells")
+        .soundVolume(100)
         .user(user)
         .build();
   }
@@ -72,7 +73,8 @@ public class TestDataFactory {
         userSettings.getShortBreakSeconds(),
         userSettings.getLongBreakSeconds(),
         userSettings.getPomodoroInterval(),
-        userSettings.getSound());
+        userSettings.getSound(),
+        userSettings.getSoundVolume());
   }
 
   public static PomodoroSession createPomodoroSession() {

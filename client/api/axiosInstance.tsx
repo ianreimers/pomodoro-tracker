@@ -31,7 +31,14 @@ function AxiosInterceptor({ children }: { children: React.ReactNode }) {
       switch (error.response.status) {
         case 401:
           handleUnauthorizedError(error.response.data);
-          return
+          return;
+        case 409:
+          console.log(error.response.data.message);
+          toast({
+            description: error.response.data.message,
+            variant: "destructive"
+          })
+        return;
         default:
           console.error(`Unhandled error [${error.response.status}]:`, error.response.data);
       }

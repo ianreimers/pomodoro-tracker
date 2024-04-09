@@ -85,8 +85,11 @@ export default function AuthContextProvider({ children }: AuthContextProviderPro
 			});
 			router.push("/");
 		} catch (error) {
-			toast({ description: "Server error occured", variant: "destructive" });
-
+			if (axios.isAxiosError(error)) {
+				// Error should already be handled in the axios error response interceptor.
+			} else {
+				toast({ description: "Server error occured", variant: "destructive" });
+			}
 		}
 	}
 

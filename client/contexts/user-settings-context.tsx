@@ -31,7 +31,7 @@ const initialState: UserSettingsState = {
   longBreakSeconds: timeUnitsToSeconds(initialLongBreakTimeUnits),
   pomodoroInterval: 4,
   sound: 'bells',
-  soundVolume: 1,
+  soundVolume: 75,
 };
 
 interface UserSettingsContextType {

@@ -4,6 +4,12 @@ import { useAuthContext } from '@/contexts/auth/auth-context';
 import { useEffect, useState } from 'react';
 import { useToast } from '@/components/ui/use-toast';
 
+interface ErrorResponse {
+  message: string;
+  timestamp: string;
+  details: string;
+}
+
 const axiosInstance = axios.create({
   baseURL: `${process.env.NEXT_PUBLIC_API_BASE_URL}`,
   headers: {
@@ -16,25 +22,23 @@ function AxiosInterceptor({ children }: { children: React.ReactNode }) {
   const { logout, isAuthenticated } = useAuthContext();
   const { toast } = useToast();
 
-  /*
-   *
-   * As of right now, the server only returns an array of error messages
-   * for the errors that are handled
-   * {
-   *   "errors": string[]
-   * }
-   *
-   */
-
   function handleAxiosError(error: AxiosError) {
     if (error.response) {
+      const data = error.response.data as ErrorResponse;
+
       switch (error.response.status) {
         case 401:
           handleUnauthorizedError(error.response.data);
           return;
+        case 404:
+          toast({
+            description: data.message,
+            variant: 'destructive',
+          });
+          return;
         case 409:
           toast({
-            description: error.response.data.message,
+            description: data.message,
             variant: 'destructive',
           });
           return;

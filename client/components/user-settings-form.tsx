@@ -23,57 +23,6 @@ import {
 import useAudioPlayer from '@/hooks/use-audio-player';
 import { Slider } from './ui/slider';
 
-/*
-
-	Note: When developing, adding the seconds code below to the form allows easier 
-	testing for the session timer
-
-	defaultValues: {
-			taskTimeSeconds: taskTimeUnits.secs,
-			shortBreakSeconds: shortBreakTimeUnits.secs,
-			longBreakSeconds: longBreakTimeUnits.secs,
-	}
-
-	<FormField control={form.control}
-		name="taskTimeSeconds"
-		render={({ field }) => (
-			<FormItem>
-				<FormLabel>Seconds</FormLabel>
-				<FormControl>
-					<Input {...field} />
-				</FormControl>
-				<FormMessage />
-			</FormItem>)}
-	/>
-	<FormField
-		control={form.control}
-		name="shortBreakSeconds"
-		render={({ field }) => (
-			<FormItem>
-				<FormLabel>Seconds</FormLabel>
-				<FormControl>
-					<Input {...field} />
-				</FormControl>
-				<FormMessage />
-			</FormItem>
-		)}
-	/>
-	<FormField
-		control={form.control}
-		name="longBreakSeconds"
-		render={({ field }) => (
-			<FormItem>
-				<FormLabel>Seconds</FormLabel>
-				<FormControl>
-					<Input {...field} />
-				</FormControl>
-				<FormMessage />
-			</FormItem>
-		)}
-	/>
-
- */
-
 export default function UserSettingsForm() {
   const {
     taskTimeUnits,
@@ -127,7 +76,7 @@ export default function UserSettingsForm() {
               <FormItem>
                 <FormLabel>Hours</FormLabel>
                 <FormControl>
-                  <Input {...field} />
+                  <Input type="number" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -140,7 +89,7 @@ export default function UserSettingsForm() {
               <FormItem>
                 <FormLabel>Minutes</FormLabel>
                 <FormControl>
-                  <Input {...field} />
+                  <Input type="number" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -156,7 +105,7 @@ export default function UserSettingsForm() {
               <FormItem>
                 <FormLabel>Hours</FormLabel>
                 <FormControl>
-                  <Input {...field} />
+                  <Input type="number" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -169,7 +118,7 @@ export default function UserSettingsForm() {
               <FormItem>
                 <FormLabel>Minutes</FormLabel>
                 <FormControl>
-                  <Input {...field} />
+                  <Input type="number" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -185,7 +134,7 @@ export default function UserSettingsForm() {
                 Pomodoro Interval
               </FormLabel>
               <FormControl>
-                <Input {...field} />
+                <Input type="number" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -200,7 +149,7 @@ export default function UserSettingsForm() {
               <FormItem>
                 <FormLabel>Hours</FormLabel>
                 <FormControl>
-                  <Input {...field} />
+                  <Input type="number" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -213,7 +162,7 @@ export default function UserSettingsForm() {
               <FormItem>
                 <FormLabel>Minutes</FormLabel>
                 <FormControl>
-                  <Input {...field} />
+                  <Input type="number" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -260,6 +209,7 @@ export default function UserSettingsForm() {
               </FormLabel>
               <FormControl className="h-full">
                 <Slider
+                  name="soundVolume"
                   onPointerUp={() => {
                     playSound(
                       form.getValues('sound'),
@@ -290,3 +240,53 @@ export default function UserSettingsForm() {
     </Form>
   );
 }
+/*
+
+	Note: When developing, adding the seconds code below to the form allows easier 
+	testing for the session timer
+
+	defaultValues: {
+			taskTimeSeconds: taskTimeUnits.secs,
+			shortBreakSeconds: shortBreakTimeUnits.secs,
+			longBreakSeconds: longBreakTimeUnits.secs,
+	}
+
+	<FormField control={form.control}
+		name="taskTimeSeconds"
+		render={({ field }) => (
+			<FormItem>
+				<FormLabel>Seconds</FormLabel>
+				<FormControl>
+					<Input {...field} />
+				</FormControl>
+				<FormMessage />
+			</FormItem>)}
+	/>
+	<FormField
+		control={form.control}
+		name="shortBreakSeconds"
+		render={({ field }) => (
+			<FormItem>
+				<FormLabel>Seconds</FormLabel>
+				<FormControl>
+					<Input {...field} />
+				</FormControl>
+				<FormMessage />
+			</FormItem>
+		)}
+	/>
+	<FormField
+		control={form.control}
+		name="longBreakSeconds"
+		render={({ field }) => (
+			<FormItem>
+				<FormLabel>Seconds</FormLabel>
+				<FormControl>
+					<Input {...field} />
+				</FormControl>
+				<FormMessage />
+			</FormItem>
+		)}
+	/>
+
+ */

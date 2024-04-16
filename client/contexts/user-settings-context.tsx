@@ -4,9 +4,8 @@ import { useToast } from '@/components/ui/use-toast';
 import {
   mapSettingsToState,
   mapUserSettingsFormDataToState,
-  secondsToTimeUnits,
-  timeUnitsToSeconds,
-} from '@/lib/utils';
+} from '@/lib/mappers/userSettingsMapper';
+import { secondsToTimeUnits, timeUnitsToSeconds } from '@/lib/timeConversions';
 import { TimeUnitNums, UserSettings, UserSettingsState } from '@/types/types';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { createContext, useContext, useEffect, useReducer } from 'react';
@@ -17,6 +16,7 @@ import { isEqual } from 'lodash';
 
 type UserContextProviderProps = {
   children: React.ReactNode;
+  initialStateOverride?: Partial<UserSettingsState>;
 };
 
 const initialTaskTimeUnits = { hours: 0, mins: 25, secs: 0 };
@@ -68,9 +68,13 @@ export const UserSettingsContext =
 
 export default function UserSettingsContextProvider({
   children,
+  initialStateOverride,
 }: UserContextProviderProps) {
   const { isAuthenticated, user } = useAuthContext();
-  const [state, dispatch] = useReducer(reducer, initialState);
+  const [state, dispatch] = useReducer(reducer, {
+    ...initialState,
+    ...initialStateOverride,
+  });
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const {

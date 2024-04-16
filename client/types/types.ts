@@ -1,3 +1,6 @@
+import { PomodoroAction } from '@/contexts/pomodoro/pomodoro-reducer';
+import { Dispatch } from 'react';
+
 export interface Credentials {
   username: string;
   password: string;
@@ -25,6 +28,8 @@ export interface PomodoroContextType {
   currSessionType: SessionType;
   isPlaying: boolean;
   totalPomodoros: number;
+  intervalTimeRemaining: number;
+  dispatch: Dispatch<PomodoroAction>;
   resetCycle: () => void;
   togglePlaying: () => void;
   skipSession: () => void;
@@ -101,7 +106,7 @@ export interface UserSettingsState {
   soundVolume: number;
 }
 
-export type PomodoroTotalsAPIData = {
+export type PomodoroTotalsResponse = {
   totalTasks: number;
   totalTaskSeconds: number;
   totalPomodoros: number;
@@ -127,9 +132,25 @@ export interface PomodoroTotalUIData {
   };
 }
 
-export interface WeekAnalaytics {
-  dayOfTheWeek: String;
+export type DayOfTheWeek =
+  | 'Monday'
+  | 'Tuesday'
+  | 'Wednesday'
+  | 'Thursday'
+  | 'Friday'
+  | 'Saturday'
+  | 'Sunday';
+
+export interface WeekAnalayticsResponse {
+  dayOfTheWeek: DayOfTheWeek;
   totalLongBreakSeconds: number;
   totalShortBreakSeconds: number;
   totalTaskSeconds: number;
+}
+
+export interface WeekChartData {
+  dayOfTheWeek: string;
+  totalTaskMinutes: number;
+  totalShortBreakMinutes: number;
+  totalLongBreakMinutes: number;
 }

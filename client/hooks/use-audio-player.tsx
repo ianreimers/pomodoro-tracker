@@ -12,7 +12,7 @@ export default function useAudioPlayer(
   function playSound(sound: string, newVolume: number) {
     const soundPath = `/sounds/${sound}.mp3`;
     audioRef.current.pause();
-    audioRef.current.fastSeek(0);
+    audioRef.current.currentTime = 0;
     if (!audioRef.current.src.includes(soundPath)) {
       audioRef.current.src = soundPath;
       audioRef.current.load();
@@ -24,7 +24,7 @@ export default function useAudioPlayer(
 
   function stopSound() {
     audioRef.current.pause();
-    audioRef.current.fastSeek(0);
+    audioRef.current.currentTime = 0;
   }
 
   function mapSoundVolumeToAudioVolume(soundVolume: number) {

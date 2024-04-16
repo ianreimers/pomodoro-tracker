@@ -9,19 +9,33 @@ import { useAuthContext } from '@/contexts/auth/auth-context';
 import useAudioPlayer from '@/hooks/use-audio-player';
 import {
   PomodoroContextType,
+  PomodoroReducerState,
   PomodoroSession,
-  SessionType,
 } from '@/types/types';
 import { reducer } from './pomodoro-reducer';
+import { v4 as uuid } from 'uuid';
+import usePomodoroTimer from '@/hooks/use-pomodoro-timer';
 
 type UserContextProviderProps = {
   children: React.ReactNode;
+  initialStateOverride?: Partial<PomodoroReducerState>;
 };
 
 export const PomodoroContext = createContext<PomodoroContextType | null>(null);
 
+const initialPomodoroState: PomodoroReducerState = {
+  remainingSeconds: 1500,
+  intervalTimeRemaining: 1000,
+  isPlaying: false,
+  totalPomodoros: 0,
+  currSessionType: 'task',
+  currPomodoroId: uuid(),
+  currBreakType: 'SHORT',
+};
+
 export default function PomodoroContextProvider({
   children,
+  initialStateOverride,
 }: UserContextProviderProps) {
   const {
     taskSeconds,
@@ -33,13 +47,8 @@ export default function PomodoroContextProvider({
   } = useUserSettingsContext();
   const { isAuthenticated } = useAuthContext();
   const [state, dispatch] = useReducer(reducer, {
-    remainingSeconds: taskSeconds,
-    intervalTimeRemaining: 1000,
-    isPlaying: false,
-    totalPomodoros: 0,
-    currSessionType: 'task',
-    currPomodoroId: crypto.randomUUID(),
-    currBreakType: pomodoroInterval === 1 ? 'LONG' : 'SHORT',
+    ...initialPomodoroState,
+    ...initialStateOverride,
   });
   const { toast } = useToast();
   const { playSound } = useAudioPlayer(sound, soundVolume);
@@ -117,6 +126,19 @@ export default function PomodoroContextProvider({
     });
   }
 
+  usePomodoroTimer({
+    remainingSeconds,
+    shortBreakSeconds,
+    longBreakSeconds,
+    pomodoroInterval,
+    sound,
+    soundVolume,
+    taskSeconds,
+    intervalTimeRemaining,
+    isPlaying,
+    dispatch,
+  });
+
   // Check if any of the used user settings were updated and reset the session
   useEffect(() => {
     dispatch({
@@ -136,98 +158,13 @@ export default function PomodoroContextProvider({
     sound,
   ]);
 
-  useEffect(() => {
-    if (!isPlaying) {
-      return;
-    }
-
-    // If we're logged in and at the start of a task, create a new pomodoro session with the server
-    if (isAuthenticated() && currSessionType === 'task') {
-      if (taskSeconds === remainingSeconds) {
-        mutationPost.mutate({
-          tempUuid: currPomodoroId as string,
-          breakType: currBreakType,
-          sessionTaskSeconds: taskSeconds,
-          sessionShortBreakSeconds: shortBreakSeconds,
-          sessionLongBreakSeconds: longBreakSeconds,
-          sessionStartTime: new Date().toISOString(),
-          sessionUpdateTime: new Date().toISOString(),
-          taskDuration: 0,
-          breakDuration: 0,
-        });
-      }
-    }
-
-    // Update the posted pomodoro every minute
-    if (isAuthenticated() && remainingSeconds % 60 === 0) {
-      const sessionSecondsMap = new Map<string, number>([
-        ['task', taskSeconds],
-        ['short break', shortBreakSeconds],
-        ['long break', longBreakSeconds],
-      ]);
-
-      if (sessionSecondsMap.get(currSessionType) !== remainingSeconds) {
-        mutationPatch.mutate({
-          id: currPomodoroId,
-          sessionType: currSessionType === 'task' ? 'task' : 'break',
-        });
-      }
-    }
-
-    // Capture the moment, in millis, that this second began
-    let startTime = Date.now();
-
-    // Used to decide wheather to calculate any remaining time on component unmount
-    let intervalCompleted = false;
-
-    const intervalId = setInterval(() => {
-      // Check if we need to switch to the next session or decrement remaining seconds
-      if (remainingSeconds === 0) {
-        playSound(sound, soundVolume);
-        dispatch({
-          type: 'switch_session',
-          payload: {
-            taskSeconds,
-            shortBreakSeconds,
-            longBreakSeconds,
-            pomodoroInterval,
-          },
-        });
-      } else {
-        dispatch({ type: 'complete_interval' });
-      }
-
-      intervalCompleted = true;
-    }, intervalTimeRemaining); // The delay is when the user paused in (second - timeRemaining)
-
-    return () => {
-      const stopTime = Date.now();
-
-      let milliDiff = stopTime - startTime;
-      milliDiff = milliDiff > 1000 ? 1000 : milliDiff;
-
-      let remainingMilli = intervalTimeRemaining - milliDiff;
-      remainingMilli = remainingMilli <= 0 ? 1000 : remainingMilli;
-
-      if (!intervalCompleted && remainingSeconds !== 0) {
-        dispatch({
-          type: 'duration_remaining',
-          payload: {
-            intervalTimeRemaining: remainingMilli,
-          },
-        });
-      }
-
-      // Clear the interval upon unmount
-      clearInterval(intervalId);
-    };
-  }, [remainingSeconds, isPlaying]);
-
   const contextValue: PomodoroContextType = {
     remainingSeconds,
     currSessionType,
     isPlaying,
     totalPomodoros,
+    intervalTimeRemaining,
+    dispatch,
     resetCycle,
     togglePlaying,
     skipSession,

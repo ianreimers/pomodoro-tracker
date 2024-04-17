@@ -3,7 +3,7 @@
 import { createContext, useContext, useEffect, useReducer } from 'react';
 import { useUserSettingsContext } from '@/contexts/user-settings-context';
 import { useMutation } from '@tanstack/react-query';
-import axiosInstance from '@/api/axiosInstance';
+import { axiosInstance } from '@/services/api';
 import { useToast } from '@/components/ui/use-toast';
 import { useAuthContext } from '@/contexts/auth/auth-context';
 import useAudioPlayer from '@/hooks/use-audio-player';
@@ -15,6 +15,7 @@ import {
 import { reducer } from './pomodoro-reducer';
 import { v4 as uuid } from 'uuid';
 import usePomodoroTimer from '@/hooks/use-pomodoro-timer';
+import { useCreatePomodoro, useUpdatePomodoro } from '@/services/mutations';
 
 type UserContextProviderProps = {
   children: React.ReactNode;
@@ -50,7 +51,6 @@ export default function PomodoroContextProvider({
     ...initialPomodoroState,
     ...initialStateOverride,
   });
-  const { toast } = useToast();
   const { playSound } = useAudioPlayer(sound, soundVolume);
   const {
     remainingSeconds,
@@ -62,69 +62,8 @@ export default function PomodoroContextProvider({
     currBreakType,
   } = state;
 
-  const mutationPost = useMutation({
-    mutationFn: async (newPomodoro: PomodoroSession) => {
-      const response = await axiosInstance.post(
-        '/pomodoro-sessions',
-        newPomodoro
-      );
-      return response.data;
-    },
-    onSuccess: (data) => {
-      // The temp uuid will be replaced with the id the server sends back, for future updates
-      const newId = data.id as number;
-      dispatch({
-        type: 'update_pomdoro_id',
-        payload: { newId },
-      });
-    },
-    onError: (error) => {
-      console.error('Error in pomodoro post mutation:', error);
-    },
-  });
-
-  const mutationPatch = useMutation({
-    mutationFn: async (data: { sessionType: string; id: string | number }) =>
-      await axiosInstance.patch(`/pomodoro-sessions/${data.id}`, {
-        sessionType: data.sessionType,
-      }),
-    onSuccess: () => {
-      toast({
-        description: `Pomodoro updated`,
-      });
-    },
-    onError: (error) => {
-      console.error('Error in pomodoro patch mutation:', error);
-    },
-  });
-
-  function togglePlaying() {
-    dispatch({
-      type: 'toggle_playing',
-    });
-  }
-
-  function resetCycle() {
-    dispatch({
-      type: 'reset_cycle',
-      payload: {
-        taskSeconds,
-        pomodoroInterval,
-      },
-    });
-  }
-
-  function skipSession() {
-    dispatch({
-      type: 'switch_session',
-      payload: {
-        taskSeconds,
-        shortBreakSeconds,
-        longBreakSeconds,
-        pomodoroInterval,
-      },
-    });
-  }
+  const createPomodoroMutation = useCreatePomodoro(dispatch);
+  const updatePomodoroMutation = useUpdatePomodoro();
 
   usePomodoroTimer({
     remainingSeconds,
@@ -157,6 +96,83 @@ export default function PomodoroContextProvider({
     pomodoroInterval,
     sound,
   ]);
+
+  // Check if a minute passed to update the pomodoro
+  useEffect(() => {
+    handleUpdatePomodoro();
+  }, [remainingSeconds]);
+
+  function handleUpdatePomodoro() {
+    if (!isAuthenticated() || remainingSeconds % 60 !== 0) {
+      return;
+    }
+
+    const sessionSecondsMap = new Map<string, number>([
+      ['task', taskSeconds],
+      ['short break', shortBreakSeconds],
+      ['long break', longBreakSeconds],
+    ]);
+
+    if (sessionSecondsMap.get(currSessionType) !== remainingSeconds) {
+      updatePomodoroMutation.mutate({
+        id: currPomodoroId,
+        sessionType: currSessionType === 'task' ? 'task' : 'break',
+      });
+    }
+  }
+
+  function handleCreateNewPomodoro() {
+    if (!isAuthenticated() || currSessionType !== 'task') {
+      return;
+    }
+
+    if (
+      typeof currPomodoroId === 'string' &&
+      !createPomodoroMutation.isPending
+    ) {
+      createPomodoroMutation.mutate({
+        tempUuid: uuid(),
+        breakType: currBreakType,
+        sessionTaskSeconds: taskSeconds,
+        sessionShortBreakSeconds: shortBreakSeconds,
+        sessionLongBreakSeconds: longBreakSeconds,
+        sessionStartTime: new Date().toISOString(),
+        sessionUpdateTime: new Date().toISOString(),
+        taskDuration: 0,
+        breakDuration: 0,
+      });
+    }
+  }
+
+  function togglePlaying() {
+    dispatch({
+      type: 'toggle_playing',
+    });
+
+    handleCreateNewPomodoro();
+  }
+
+  function resetCycle() {
+    dispatch({
+      type: 'reset_cycle',
+      payload: {
+        taskSeconds,
+        pomodoroInterval,
+      },
+    });
+  }
+
+  function skipSession() {
+    dispatch({
+      type: 'switch_session',
+      payload: {
+        taskSeconds,
+        shortBreakSeconds,
+        longBreakSeconds,
+        pomodoroInterval,
+      },
+    });
+  }
 
   const contextValue: PomodoroContextType = {
     remainingSeconds,

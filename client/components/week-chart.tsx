@@ -8,11 +8,11 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-import axiosInstance from '@/api/axiosInstance';
-import { useQuery } from '@tanstack/react-query';
 import { mapWeekAnalyticsToChartData } from '@/lib/mappers/pomodoroMapper';
 
 import tailwindConfig from '@/tailwind.config';
+import { useWeekTotals } from '@/services/queries';
+import { LoaderIcon } from 'lucide-react';
 
 const primaryColor = tailwindConfig.theme.extend.colors.primary.DEFAULT;
 const primaryColorForeground =
@@ -24,24 +24,29 @@ const foregroundColor = tailwindConfig.theme.extend.colors.foreground;
 const destructiveColor = tailwindConfig.theme.extend.colors.destructive.DEFAULT;
 
 export default function WeekChart() {
-  const { data, isLoading, isError } = useQuery({
-    queryKey: ['currentWeekTotals'],
-    queryFn: () =>
-      axiosInstance
-        .get('/pomodoro-sessions/analytics/current-week')
-        .then((res) => res.data),
-  });
+  const weekTotals = useWeekTotals();
 
-  if (isLoading) {
-    return <p>Loading...</p>;
+  if (weekTotals.isPending) {
+    return (
+      <div className="flex items-center justify-center">
+        <LoaderIcon className="animate-spin" />
+      </div>
+    );
   }
 
-  if (isError) {
-    return <p>Error retreiving week analytics</p>;
+  if (weekTotals.isError) {
+    return (
+      <div className="flex items-center justify-center">
+        <p>Error retreiving week analytics</p>
+      </div>
+    );
   }
   return (
     <ResponsiveContainer width="100%" height={450}>
-      <BarChart className="m-0 p-0" data={mapWeekAnalyticsToChartData(data)}>
+      <BarChart
+        className="m-0 p-0"
+        data={mapWeekAnalyticsToChartData(weekTotals.data)}
+      >
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis dataKey="dayOfTheWeek" />
         <YAxis

@@ -57,6 +57,14 @@ export interface PomodoroSession {
   breakType: string;
 }
 
+export interface PomodoroSessionResponse extends PomodoroSession {
+  id: number;
+}
+
+export interface PomodoroSessionPatchRequest {
+  sessiontType: 'task' | 'break';
+}
+
 export interface TimeUnitNums {
   hours: number;
   mins: number;

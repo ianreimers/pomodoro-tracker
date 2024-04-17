@@ -1,27 +1,29 @@
-import axiosInstance from '@/api/axiosInstance';
-import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardTitle } from './ui/card';
+import { LoaderIcon } from 'lucide-react';
 import { mapTotalDataToTodayUIData } from '@/lib/mappers/pomodoroMapper';
-import { PomodoroTotalsResponse, PomodoroTotalUIData } from '@/types/types';
+import { PomodoroTotalUIData } from '@/types/types';
+import { useTodayTotals } from '@/services/queries';
 
 export default function TodayTotals() {
-  const { data, isLoading, isError } = useQuery({
-    queryKey: ['dailyTotal'],
-    queryFn: (): Promise<PomodoroTotalsResponse> =>
-      axiosInstance
-        .get('/pomodoro-sessions/analytics/today-totals')
-        .then((res) => res.data),
-  });
+  const todayTotals = useTodayTotals();
 
-  if (isLoading) {
-    return <p>Loading...</p>;
+  if (todayTotals.isPending) {
+    return (
+      <div className="flex items-center justify-center">
+        <LoaderIcon className="animate-spin" />
+      </div>
+    );
   }
 
-  if (isError || !data) {
-    return <p>Error retreiving overview data from the server</p>;
+  if (todayTotals.isError) {
+    return (
+      <div className="flex items-center justify-center">
+        <p>Error retreiving overview data from the server</p>
+      </div>
+    );
   }
 
-  const uiData = mapTotalDataToTodayUIData(data);
+  const uiData = mapTotalDataToTodayUIData(todayTotals.data);
 
   return (
     <>

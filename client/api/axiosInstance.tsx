@@ -3,19 +3,13 @@ import axios, { AxiosError } from 'axios';
 import { useAuthContext } from '@/contexts/auth/auth-context';
 import { useEffect, useState } from 'react';
 import { useToast } from '@/components/ui/use-toast';
+import { axiosInstance } from '@/services/api';
 
 interface ErrorResponse {
   message: string;
   timestamp: string;
   details: string;
 }
-
-const axiosInstance = axios.create({
-  baseURL: `${process.env.NEXT_PUBLIC_API_BASE_URL}`,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
 
 function AxiosInterceptor({ children }: { children: React.ReactNode }) {
   const [isSet, setIsSet] = useState(false);
@@ -128,5 +122,4 @@ function AxiosInterceptor({ children }: { children: React.ReactNode }) {
   return isSet && children;
 }
 
-export default axiosInstance;
 export { AxiosInterceptor };

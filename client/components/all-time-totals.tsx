@@ -1,27 +1,29 @@
-import axiosInstance from '@/api/axiosInstance';
-import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardTitle } from './ui/card';
-import { mapTotalDataToTodayUIData } from '@/lib/utils';
-import { PomodoroTotalsResponse, PomodoroTotalUIData } from '@/types/types';
+import { mapTotalDataToTodayUIData } from '@/lib/mappers/pomodoroMapper';
+import { PomodoroTotalUIData } from '@/types/types';
+import { useAllTimeTotals } from '@/services/queries';
+import { LoaderIcon } from 'lucide-react';
 
 export function AllTimeTotals() {
-  const { data, isLoading, isError } = useQuery({
-    queryKey: ['allTimeTotal'],
-    queryFn: (): Promise<PomodoroTotalsResponse> =>
-      axiosInstance
-        .get('/pomodoro-sessions/analytics/all-time-totals')
-        .then((res) => res.data),
-  });
+  const allTimeTotals = useAllTimeTotals();
 
-  if (isLoading) {
-    return <p>Loading...</p>;
+  if (allTimeTotals.isPending) {
+    return (
+      <div className="flex items-center justify-center">
+        <LoaderIcon className="animate-spin" />
+      </div>
+    );
   }
 
-  if (isError || !data) {
-    return <p>Error retreiving overview data from the server</p>;
+  if (allTimeTotals.isError) {
+    return (
+      <div className="flex items-center justify-center">
+        <p>Error retreiving overview data from the server</p>
+      </div>
+    );
   }
 
-  const uiData = mapTotalDataToTodayUIData(data);
+  const uiData = mapTotalDataToTodayUIData(allTimeTotals.data);
 
   return (
     <>

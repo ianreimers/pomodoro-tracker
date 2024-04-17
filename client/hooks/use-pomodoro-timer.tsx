@@ -43,6 +43,8 @@ export default function usePomodoroTimer({
 
       intervalId = setInterval(() => {
         // Check if we need to switch to the next session or decrement remaining seconds
+        intervalCompleted = true;
+
         if (remainingSeconds <= 0) {
           playSound(sound, soundVolume);
           dispatch({
@@ -57,16 +59,14 @@ export default function usePomodoroTimer({
         } else {
           dispatch({ type: 'complete_interval' });
         }
-
-        intervalCompleted = true;
-      }, intervalTimeRemaining) as unknown as number; // The delay is when the user paused in (second - timeRemaining)
+      }, intervalTimeRemaining) as unknown as number;
     }
 
     return () => {
       // Clear the interval upon unmount
       clearInterval(intervalId);
 
-      if (intervalCompleted) {
+      if (!isPlaying || intervalCompleted) {
         return;
       }
 

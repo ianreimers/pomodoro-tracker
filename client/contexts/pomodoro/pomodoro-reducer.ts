@@ -85,6 +85,7 @@ export function reducer(
     }
     case 'reset_cycle':
       return {
+        ...state,
         remainingSeconds: action.payload.taskSeconds,
         intervalTimeRemaining: 1000,
         isPlaying: false,

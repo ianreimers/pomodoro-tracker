@@ -10,14 +10,29 @@ import { TimeUnitNums, UserSettings, UserSettingsState } from '@/types/types';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { createContext, useContext, useEffect, useReducer } from 'react';
 import { useAuthContext } from '@/contexts/auth/auth-context';
-import axiosInstance from '@/api/axiosInstance';
+import { axiosInstance } from '@/services/api';
 import { UserSettingsFormData } from '@/validation_schema/schemas';
 import { isEqual } from 'lodash';
+import { useUserSettings } from '@/services/queries';
+import { useUpdateUserSettings } from '@/services/mutations';
 
 type UserContextProviderProps = {
   children: React.ReactNode;
   initialStateOverride?: Partial<UserSettingsState>;
 };
+
+interface UserSettingsContextType {
+  taskSeconds: number;
+  shortBreakSeconds: number;
+  longBreakSeconds: number;
+  taskTimeUnits: TimeUnitNums;
+  shortBreakTimeUnits: TimeUnitNums;
+  longBreakTimeUnits: TimeUnitNums;
+  pomodoroInterval: number;
+  sound: string;
+  soundVolume: number;
+  updateSettings: (newSettings: UserSettingsFormData) => void;
+}
 
 const initialTaskTimeUnits = { hours: 0, mins: 25, secs: 0 };
 const initialShortBreakTimeUnits = { hours: 0, mins: 10, secs: 0 };
@@ -34,26 +49,13 @@ const initialState: UserSettingsState = {
   soundVolume: 75,
 };
 
-interface UserSettingsContextType {
-  taskSeconds: number;
-  shortBreakSeconds: number;
-  longBreakSeconds: number;
-  taskTimeUnits: TimeUnitNums;
-  shortBreakTimeUnits: TimeUnitNums;
-  longBreakTimeUnits: TimeUnitNums;
-  pomodoroInterval: number;
-  sound: string;
-  soundVolume: number;
-  updateSettings: (newSettings: UserSettingsFormData) => void;
-}
-
-type ACTIONTYPE =
+export type UserSettingsAction =
   | { type: 'update_settings'; payload: UserSettingsState }
   | { type: 'default_settings' };
 
 function reducer(
   state: UserSettingsState,
-  action: ACTIONTYPE
+  action: UserSettingsAction
 ): UserSettingsState {
   switch (action.type) {
     case 'default_settings':
@@ -70,13 +72,12 @@ export default function UserSettingsContextProvider({
   children,
   initialStateOverride,
 }: UserContextProviderProps) {
-  const { isAuthenticated, user } = useAuthContext();
+  const { isAuthenticated } = useAuthContext();
   const [state, dispatch] = useReducer(reducer, {
     ...initialState,
     ...initialStateOverride,
   });
   const { toast } = useToast();
-  const queryClient = useQueryClient();
   const {
     taskSeconds,
     shortBreakSeconds,
@@ -91,76 +92,42 @@ export default function UserSettingsContextProvider({
 
   const {
     data: userSettings,
+    isPending,
     isLoading,
+    isError,
     error,
-  } = useQuery({
-    queryKey: ['userSettings'],
-    queryFn: async () => {
-      const response = await axiosInstance.get('/settings');
-      return response.data as UserSettings;
-    },
-    enabled: isAuthenticated(),
-  });
+  } = useUserSettings(isAuthenticated());
 
-  const mutation = useMutation({
-    mutationFn: async (newSettings: UserSettings) => {
-      const response = await axiosInstance.put('/settings', newSettings);
-      return response.data as UserSettings;
-    },
-    onError: (error) => {
-      toast({
-        description: error.message,
-      });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['userSettings'] });
-    },
-  });
+  const updateUserSettingsMutation = useUpdateUserSettings(dispatch);
 
-  // Even though we can just use react query's context, sharing state
-  // allows unauthenticted users to still use the app
+  // Update the state with the fetched user settings for the logged in user
   useEffect(() => {
-    if (userSettings) {
-      dispatch({
-        type: 'update_settings',
-        payload: mapSettingsToState(userSettings),
-      });
-    } else {
-      dispatch({
-        type: 'default_settings',
-      });
+    if (isPending) {
+      return;
     }
 
-    if (error) {
+    if (isError) {
       toast({
         description: error.message,
       });
+      return;
     }
+
+    dispatch({
+      type: 'update_settings',
+      payload: mapSettingsToState(userSettings),
+    });
   }, [userSettings]);
 
+  // User logged out, ensure the state is reset
   useEffect(() => {
-    if (isAuthenticated() && user) {
-      dispatch({
-        type: 'update_settings',
-        payload: {
-          taskSeconds,
-          shortBreakSeconds,
-          longBreakSeconds,
-          shortBreakTimeUnits: secondsToTimeUnits(shortBreakSeconds, false),
-          longBreakTimeUnits: secondsToTimeUnits(longBreakSeconds, false),
-          taskTimeUnits: secondsToTimeUnits(taskSeconds, false),
-          pomodoroInterval,
-          sound,
-          soundVolume,
-        },
-      });
-    }
-  }, [isAuthenticated]);
+    dispatch({ type: 'default_settings' });
+  }, [!isAuthenticated()]);
 
   function updateSettings(newSettings: UserSettingsFormData) {
     const newState = mapUserSettingsFormDataToState(newSettings);
 
-    // State is the same so don't do anything
+    // State is the same so no need to update
     if (isEqual(newState, state)) {
       return;
     }
@@ -169,6 +136,7 @@ export default function UserSettingsContextProvider({
       description: 'Your settings are updated',
     });
 
+    // Dont send a mutation, only update the state if we're logged in
     if (!isAuthenticated()) {
       dispatch({
         type: 'update_settings',
@@ -177,14 +145,7 @@ export default function UserSettingsContextProvider({
       return;
     }
 
-    mutation.mutate({
-      taskSeconds: newState.taskSeconds,
-      shortBreakSeconds: newState.shortBreakSeconds,
-      longBreakSeconds: newState.longBreakSeconds,
-      pomodoroInterval: newState.pomodoroInterval,
-      sound: newState.sound,
-      soundVolume: newState.soundVolume,
-    });
+    updateUserSettingsMutation.mutate(newState);
   }
 
   const contextValue: UserSettingsContextType = {

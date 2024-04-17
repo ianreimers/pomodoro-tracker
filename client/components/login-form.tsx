@@ -25,7 +25,6 @@ const formSchema = z.object({
       message: 'Username must be less than 256 characters',
     }),
   password: z.string().min(6).max(255),
-  confirmPassword: z.string().min(6).max(255),
 });
 
 export default function LoginForm() {

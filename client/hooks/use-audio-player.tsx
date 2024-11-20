@@ -1,42 +1,43 @@
 import { useEffect, useRef } from 'react';
+import { Howl, Howler } from 'howler';
 
 export default function useAudioPlayer(
   sound: string | undefined = 'bells',
   soundVolume?: number
 ) {
-  const audioRef = useRef<HTMLAudioElement>(new Audio(`/sounds/${sound}.mp3`));
+  const howlerCacheRef = useRef(Howler);
+  const soundCacheRef = useRef<Record<string, Howl>>({
+    [sound]: new Howl({
+      src: [`/sounds/${sound}.mp3`],
+    }),
+  });
+
   if (soundVolume) {
-    audioRef.current.volume = mapSoundVolumeToAudioVolume(soundVolume);
+    howlerCacheRef.current.volume(soundVolume);
   }
 
   function playSound(sound: string, newVolume: number) {
-    const soundPath = `/sounds/${sound}.mp3`;
-    audioRef.current.pause();
-    audioRef.current.currentTime = 0;
-    if (!audioRef.current.src.includes(soundPath)) {
-      audioRef.current.src = soundPath;
-      audioRef.current.load();
+    if (!soundCacheRef.current[sound]) {
+      const soundPath = `/sounds/${sound}.mp3`;
+      const newSound = new Howl({
+        src: [soundPath],
+      });
+      soundCacheRef.current[sound] = newSound;
     }
 
-    audioRef.current.volume = mapSoundVolumeToAudioVolume(newVolume);
-    audioRef.current.play();
+    Howler.volume(mapSoundVolumeToAudioVolume(newVolume));
+    soundCacheRef.current[sound].play();
   }
 
   function stopSound() {
-    audioRef.current.pause();
-    audioRef.current.currentTime = 0;
+    Howler.stop();
   }
 
   function mapSoundVolumeToAudioVolume(soundVolume: number) {
     return Number((soundVolume * 0.01).toPrecision(2));
   }
 
-  useEffect(() => {
-    //return () => {
-    //	audioRef.current.pause();
-    //	audioRef.current.fastSeek(0);
-    //}
-  }, []);
+  useEffect(() => {}, []);
 
   return { playSound, stopSound };
 }
